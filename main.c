@@ -3,10 +3,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define GUILD_ID 1300798374911414303
 u64snowflake JOCI = 1300798374911414303;
 u64snowflake BOT_PARANCSOK = 298545786315079681;
+u64snowflake MY_USER_ID = 274276440642551818;
 char LEADER = '!';
 
 void on_ready(struct discord *client, const struct discord_ready *event) {
@@ -63,42 +65,87 @@ void on_interaction(struct discord *client, const struct discord_interaction *ev
 //        discord_create_interaction_response(client, event->id, event->token, &params, NULL);
 //    }
 }
-char* run_command(char* command) {
-    printf("%s", command);
-    char *response;
+
+void remove_left(char *org, const char *to_remove) {
+    char *pos = strstr(org, to_remove);
+
+    if(pos) {
+        int len = strlen(to_remove);
+        memmove(pos, pos + len, strlen(pos + len) + 1);
+    }
+}
+
+char *run_command(const char *command) {
+    FILE *fp;
+    char *response = NULL;
+    size_t size = 0;
+
+    fp = popen(command, "r");
+    if (fp == NULL) {
+        perror("popen");
+        return NULL;
+    }
+
+    char buffer[128];
+    while (fgets(buffer, sizeof(buffer), fp) != NULL) {
+        size_t buffer_len = strlen(buffer);
+        char *temp = realloc(response, size + buffer_len + 1);
+        if (temp == NULL) {
+            perror("realloc");
+            free(response);
+            pclose(fp);
+            return NULL;
+        }
+        response = temp;
+        strcpy(response + size, buffer);
+        size += buffer_len;
+    }
+
+    pclose(fp);
     return response;
 }
 
 void on_message(struct discord *client, const struct discord_message *event) {
     // Check if message should be responded to
-    if (event->author->bot) {
+    if (event->guild_id != JOCI && event->channel_id != BOT_PARANCSOK) {
+        log_info("Message ignored in guild: \n%"PRIu64"    channel: %"PRIu64"", event->guild_id, event->channel_id);
+        return;
+    } else if (event->author->bot) {
         log_info("Ignored bot: %s", event->author->username);
         return;
     }
-    else if (event->guild_id != JOCI && event->channel_id != BOT_PARANCSOK) {
-        log_info("Message ignored in guild: \n%"PRIu64"    channel: %"PRIu64"", event->guild_id, event->channel_id);
-        return;
-    }
 
-    if(event->content[0] == LEADER) {
+    char *response = NULL;
+
+    if (event->content[0] == LEADER) {
+        log_info("Leader character spotted!");
+
         char msg[strlen(event->content + 1)];
         strcpy(msg, event->content);
-        memmove(msg, msg + 1, strlen(msg));
-        log_info("Leader character spotted!");
-        char *response;
+
         char *command = strtok(msg, " ");
-        memmove(msg, msg + strlen(command), strlen(msg)
-        if(strcmp(command, "run") == 0) {
-           response = run_command();
+        char *content = strtok(NULL, "");
+
+        if (strcmp(command, "!run") == 0 || strcmp(command, "!r") == 0) {
+            if (event->author->id != MY_USER_ID) {
+                response = "You dont have permission to use this command!";
+            } else {
+                log_info("Running command: run, with argument: %s", content);
+                response = run_command(content);
+            }
+        } else {
+            log_info("Invalid command: %s", command);
+            response = "Invalid command";
         }
-    }
-    else {
-        struct discord_create_message params = { 
-            .content = event->content
-        };
-        discord_create_message(client, event->channel_id, &params, NULL);
+    } else {
+        response = event->content;
         log_info("Copied %s!", event->author->username);
     }
+
+    struct discord_create_message params = {
+        .content = response
+    };
+    discord_create_message(client, event->channel_id, &params, NULL);
 }
 
 int main(void) {

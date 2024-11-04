@@ -7,4 +7,4 @@ main: main.c
 	$(CC)  main.c -o ./build/$(ONAME) $(CFLAGS) $(LDFLAGS)
 
 clean:
-	rm $(ONAME)
+	rm ./build/$(ONAME)
