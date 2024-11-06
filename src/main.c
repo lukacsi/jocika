@@ -3,13 +3,19 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <time.h>
 
+// TEST SERVER ID
 #define GUILD_ID 1300798374911414303
 u64snowflake JOCI = 1300798374911414303;
+
+// QUALTY MEMS ID
 u64snowflake BOT_PARANCSOK = 298545786315079681;
+
+// MY UID (ADMIN)
 u64snowflake MY_USER_ID = 274276440642551818;
-char LEADER = '!';
+
+// COMMAND LEADER CHARACTER
+const char LEADER = '!';
 
 void on_ready(struct discord *client, const struct discord_ready *event) {
     log_info("Logged in as %s!", event->user->username);
@@ -86,7 +92,7 @@ char *run_command(const char *command) {
         return NULL;
     }
 
-    char buffer[128];
+    char buffer[1024];
     while (fgets(buffer, sizeof(buffer), fp) != NULL) {
         size_t buffer_len = strlen(buffer);
         char *temp = realloc(response, size + buffer_len + 1);
@@ -148,8 +154,15 @@ void on_message(struct discord *client, const struct discord_message *event) {
     discord_create_message(client, event->channel_id, &params, NULL);
 }
 
-int main(void) {
-    struct discord *client = discord_init(getenv("DISCORD_BOT_TOKEN"));
+int main(int argc, char *argv[]) {
+    const char *config;
+    if (argc > 1) {
+        config = argv[1];
+    } else {
+        config = "../config.json";
+    }
+
+    struct discord *client = discord_config_init(config);
     discord_add_intents(client, DISCORD_GATEWAY_MESSAGE_CONTENT);
     discord_set_on_ready(client, &on_ready);
     discord_set_on_interaction_create(client, &on_interaction);

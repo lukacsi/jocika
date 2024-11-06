@@ -1,0 +1,12 @@
+{
+    "logging": {
+        "level": "trace",
+        "quiet": true,
+        "http": {
+            "enable": false
+        }
+    },
+    "discord": {
+        "token": "$DISCORD_BOT_TOKEN"
+    }
+}
