@@ -1,10 +1,7 @@
-CC = gcc
-CFLAGS = -I/usr/local/include -L/usr/local/lib/
-LDFLAGS = -ldiscord -lcurl -pthread
 ONAME = bot
 
-main: ./src/main.c
-	$(CC)  ./src/main.c -o ./build/$(ONAME) $(CFLAGS) $(LDFLAGS)
+main: 
+	g++ ./src/main.cpp -o ./build/$(ONAME) -ldpp
 
 clean:
 	rm ./build/$(ONAME)
