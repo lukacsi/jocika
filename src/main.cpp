@@ -92,7 +92,7 @@ int main() {
                     return;
                 }
 
-                event.reply("Im bouta com");
+                event.reply("Joining voice.");
                 bot.on_voice_ready([&pcm_data_map, &file_name, &event](const dpp::voice_ready_t& voice_event) {
                     dpp::voiceconn* v = event.from->get_voice(event.command.guild_id);
 
