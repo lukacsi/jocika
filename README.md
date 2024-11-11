@@ -1,7 +1,8 @@
 # Házi feladat
 
 Név/Nevek NEPTUN kóddal:
-- Lukácsi Sándor ()
+- Lukácsi Sándor (DYT9Q1)
+- Kutasi Rajmund (BWCJGS)
 
 # Feladat kiírás
 Egy discord alkalmazás, mely az alábbi funkciókra képes:
