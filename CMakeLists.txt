@@ -4,8 +4,14 @@ project(jocika VERSION 0.1 DESCRIPTION "A discord bot")
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
+include_directories(include)
+
+file(GLOB_RECURSE SOURCES
+    src/*.cpp
+)
+
 add_executable(${PROJECT_NAME}
-    src/main.cpp
+    ${SOURCES}
 )
 
 find_package(DPP REQUIRED)
