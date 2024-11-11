@@ -21,6 +21,12 @@ Milyen funkciókat sikerült megvalósítani? Milyen eltérések vannak a kiír�
 # Tapasztalatok
 Milyen tapasztalatokat gyűjtött a feladat elkészítése során? Mi volt egyszerűbb / nehezebb a tervezetnél? Visszatekintve mit csinálna másként? (pár mondatban)
 
+# Dependencies
+
+- [DPP](https://github.com/brainboxdotcc/DPP)
+- [MPG123](https://www.mpg123.de/)
+
+
 # Configuring
 
 You need to set the `DISCORD_BOT_TOKEN` environment variable in your build environment. To do this, run:
