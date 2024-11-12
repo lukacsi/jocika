@@ -9,7 +9,7 @@ class Command {
 public:
     Command(std::string name, std::string description) : name(name), description(description) {}
     virtual ~Command() = default;
-    virtual void execute(const dpp::slashcommand_t& event) = 0;
+    virtual void execute(const dpp::slashcommand_t& event, const dpp::cluster&bot) = 0;
 
     void register_command(dpp::cluster& bot) {
         dpp::slashcommand command(name, description, bot.me.id);
