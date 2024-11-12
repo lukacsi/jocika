@@ -1,5 +1,4 @@
 #include "commands/play_command.h"
-#include <dpp/appcommand.h>
 #include <string>
 
 void PlayCommand::execute(const dpp::slashcommand_t& event) {
@@ -10,4 +9,5 @@ void PlayCommand::execute(const dpp::slashcommand_t& event) {
     }
             
     event.reply("");
+
 }
