@@ -9,3 +9,4 @@ cmake/cmake_install.cmake
 cmake/jocika
 media
 cookies.txt
+cmake-build-debug/
