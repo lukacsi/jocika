@@ -1,8 +1,7 @@
 #include "commands/disconnect_command.h"
 
-void DisconnectCommand::execute(const dpp::slashcommand_t& event) {
+void DisconnectCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& bot) {
     auto ec = event.command;
-
     dpp::guild* g = dpp::find_guild(ec.guild_id);
 
     auto current_vc = event.from->get_voice(ec.guild_id);

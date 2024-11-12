@@ -6,7 +6,7 @@
 class JoinCommand : public Command {
 public:
     JoinCommand() : Command("join", "Joins your voice channel.") {}
-    void execute(const dpp::slashcommand_t& event) override;
+    void execute(const dpp::slashcommand_t& event, const dpp::cluster& bot) override;
 };
 
 #endif

@@ -10,10 +10,10 @@ void CommandManager::register_commands(dpp::cluster& bot) {
     }
 }
 
-void CommandManager::execute_command(const dpp::slashcommand_t& event) {
+void CommandManager::execute_command(const dpp::slashcommand_t& event, const dpp::cluster& bot) {
     for (auto& cmd : commands) {
         if (event.command.get_command_name() == cmd->get_name()) {
-            cmd->execute(event);
+            cmd->execute(event, bot);
             break;
         }
     }

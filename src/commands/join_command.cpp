@@ -2,7 +2,7 @@
 #include <dpp/cache.h>
 #include <dpp/guild.h>
 
-void JoinCommand::execute(const dpp::slashcommand_t& event) {
+void JoinCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& bot) {
     auto ec = event.command;
 
     dpp::guild* g = dpp::find_guild(ec.guild_id);
