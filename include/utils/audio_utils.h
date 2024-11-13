@@ -6,12 +6,7 @@
 
 class AudioUtils {
 public:
-    static void join_voice_channel(const dpp::slashcommand_t& event);
-    static void play_audio();
-    static void pause_audio();
-    static void stop_audio();
-private:
-    Audio audio;
+    static bool join_voice_channel(const dpp::slashcommand_t& event);
 };
 
 #endif

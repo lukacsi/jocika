@@ -16,18 +16,21 @@ add_executable(${PROJECT_NAME}
 
 find_package(DPP REQUIRED)
 find_package(MPG123 REQUIRED)
+#find_package(Opus REQUIRED)
 
 target_link_libraries(${PROJECT_NAME}
     ${DPP_LIBRARIES}
     ${MPG123_LIBRARIES}
+    #${OPUS_LIBRARY}
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${DPP_INCLUDE_DIR}
     ${MPG123_INCLUDE_DIRS}
+    #${OPUS_INCLUDE_DIR}
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    CXX_STANDARD 17
+    CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON
 )
