@@ -1,6 +1,4 @@
 #include "commands/play_command.h"
-#include "utils/audio.h"
-#include "utils/audio_utils.h"
 #include <dpp/cache.h>
 #include <dpp/guild.h>
 #include <string>

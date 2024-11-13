@@ -7,6 +7,7 @@
 #include <memory>
 #include <mutex>
 #include <ostream>
+#include <string>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -46,8 +47,27 @@ void GuildAudioManager::queue_all(dpp::snowflake guild_id) {
             guild_queue->tracks.push(track);
         }
     }
+
     cv.notify_all();
     std::cout << "[GuildAudioManager] Queued all tracks in guild:  " << guild_id << std::endl;
+}
+
+void GuildAudioManager::skip_track(dpp::snowflake guild_id) {
+    auto guild_queue = get_queue(guild_id);
+    if (!guild_queue) {
+        std::cerr << "[GuildAudioManager] No queue found for guild " << guild_id << std::endl;
+        return;
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(guild_queue->queue_mutex);
+        if (guild_queue->is_playing) {
+            guild_queue->skip = true;
+            std::cout << "[GuildAudioManager] Skipping current track for guild " << guild_id << std::endl;
+        }
+    }
+
+    cv.notify_all();
 }
 
 void GuildAudioManager::clear_queue(dpp::snowflake guild_id) {
@@ -103,14 +123,27 @@ void GuildAudioManager::playback_loop() {
 
                     if (!guild_queue->is_playing && !guild_queue->tracks.empty()) {
                         std::string track = guild_queue->tracks.front();
+                        guild_queue->current_track = track;
                         guild_queue->tracks.pop();
                         guild_queue->is_playing = true;
-
+                        guild_queue->skip = false;
+                        
                         // Send audio in a detached thread
                         std::thread([this, guild_queue, track, guild_id]() {
                             audio->send_audio_to_voice(guild_id, track);
-                            std::this_thread::sleep_for(std::chrono::milliseconds(track_library->get_length_ms(track) + 1000));
-
+                            size_t lenght_ms = track_library->get_length_ms(track);
+                            size_t elapsed_ms = 0;
+                            
+                            while (elapsed_ms < lenght_ms) {
+                                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                                elapsed_ms += 100;
+                                if (guild_queue->skip || guild_queue->stop) {
+                                    std::cout << "[GuildAudioManager] Track skipped or stop requested: " << track << std::endl;
+                                    guild_queue->is_playing = false;
+                                    cv.notify_all();
+                                    return;
+                                }
+                            }
                             if (guild_queue) {
                                 std::lock_guard<std::mutex> lock(guild_queue->queue_mutex);
                                 if (!guild_queue->stop) {
@@ -142,4 +175,30 @@ GuildQueue* GuildAudioManager::get_queue(dpp::snowflake guild_id) {
         return ptr;
     }
     return it->second.get();
+}
+
+std::vector<std::string> GuildAudioManager::get_queued_tracks(dpp::snowflake guild_id) {
+    auto queue = get_queue(guild_id);
+    std::vector<std::string> tracks;
+    if (!queue) {
+        std::cerr << "[GuildAudioManager] No queue found for guild " << guild_id << std::endl;
+        return tracks;
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(queue->queue_mutex);
+
+        if (queue->is_playing) {
+            tracks.push_back(queue->current_track);
+        }
+
+        std::queue<std::string> temp_queue = queue->tracks;
+        while (!temp_queue.empty()) {
+            tracks.push_back(temp_queue.front());
+            temp_queue.pop();
+        }
+    }
+
+    return tracks;
+
 }

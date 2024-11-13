@@ -10,15 +10,18 @@
 #include <mutex>
 #include <queue>
 #include <thread>
+#include <vector>
 
 class Audio;
 
 struct GuildQueue {
     std::queue<std::string> tracks;
+    std::string current_track;
     bool is_playing;
     bool stop;
+    bool skip;
     std::mutex queue_mutex;
-    GuildQueue() : is_playing(false), stop(false) {}
+    GuildQueue() : is_playing(false), stop(false), skip(false) {}
 };
 
 class GuildAudioManager {
@@ -31,9 +34,15 @@ public:
 
     void queue_track(dpp::snowflake guild_id, const std::string& track_name);
     void queue_all(dpp::snowflake guild_id);
+
     void skip_track(dpp::snowflake guild_id);
-    void remove_queue(dpp::snowflake guild_id);
+
+    //void remove_queue(dpp::snowflake guild_id);
     void clear_queue(dpp::snowflake guild_id);
+
+    std::vector<std::string> get_queued_tracks(dpp::snowflake guild_id);
+
+    
 
 private:
     std::map<dpp::snowflake, std::shared_ptr<GuildQueue>> guild_queues;

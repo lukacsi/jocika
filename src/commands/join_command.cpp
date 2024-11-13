@@ -1,5 +1,4 @@
 #include "commands/join_command.h"
-#include "utils/audio.h"
 
 void JoinCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& bot) {
     auto ec = event.command;

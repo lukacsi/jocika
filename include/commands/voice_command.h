@@ -3,6 +3,7 @@
 
 #include "command.h"
 #include "utils/guild_audio_manager.h"
+#include "utils/audio.h"
 #include <dpp/appcommand.h>
 #include <dpp/dpp.h>
 #include <memory>

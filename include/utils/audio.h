@@ -9,7 +9,6 @@
 #include <mutex>
 #include <string>
 
-
 class Audio {
 public:
     Audio(std::shared_ptr<TrackLibrary> _track_library);
@@ -33,6 +32,5 @@ private:
     std::map<dpp::snowflake, dpp::voiceconn*> voice_connections;
     std::mutex voice_mutex;
 };
-
 
 #endif
