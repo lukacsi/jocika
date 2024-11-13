@@ -50,7 +50,7 @@ Follow these steps to clone the repository, create a build directory, configure 
 
 6. **Build the Project:**
    ```bash
-   cmake --build /build
+   cmake --build ./build
    ```
    This command compiles the project based on the generated build files.
 
@@ -62,7 +62,7 @@ mkdir build
 cd build
 cmake ..
 cd ..
-cmake --build /build
+cmake --build ./build
 ```
 
 # Running
