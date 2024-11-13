@@ -4,12 +4,13 @@
 #include <dpp/appcommand.h>
 #include <dpp/dpp.h>
 #include <string>
+#include <globals.h>
 
 class Command {
 public:
     Command(std::string name, std::string description) : name(name), description(description) {}
     virtual ~Command() = default;
-    virtual void execute(const dpp::slashcommand_t& event, const dpp::cluster&bot) = 0;
+    virtual void execute(const dpp::slashcommand_t& event, dpp::cluster&bot) = 0;
 
     void register_command(dpp::cluster& bot) {
         dpp::slashcommand command(name, description, bot.me.id);

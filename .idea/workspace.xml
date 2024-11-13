@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="BackendCodeEditorMiscSettings">
+    <option name="/Default/RiderDebugger/RiderRestoreDecompile/RestoreDecompileSetting/@EntryValue" value="false" type="bool" />
+    <option name="/Default/Housekeeping/GlobalSettingsUpgraded/IsUpgraded/@EntryValue" value="true" type="bool" />
+    <option name="/Default/Housekeeping/FeatureSuggestion/FeatureSuggestionManager/DisabledSuggesters/=SwitchToGoToActionSuggester/@EntryIndexedValue" value="true" type="bool" />
+  </component>
+  <component name="CMakePresetLoader">{
+  &quot;useNewFormat&quot;: true
+}</component>
+  <component name="CMakeProjectFlavorService">
+    <option name="flavorId" value="CMakePlainProjectFlavor" />
+  </component>
+  <component name="CMakeReloadState">
+    <option name="reloaded" value="true" />
+  </component>
+  <component name="CMakeRunConfigurationManager">
+    <generated>
+      <config projectName="jocika" targetName="jocika" />
+    </generated>
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="f26e1fb7-f281-45f5-97e5-a951e1f6f2b6" name="Changes" comment="">
+      <change afterPath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/include/globals.h" afterDir="false" />
+      <change afterPath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/src/globals.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/include/globals.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/globals.cpp" afterDir="false" />
+      <change beforePath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/CMakeLists.txt" beforeDir="false" afterPath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/CMakeLists.txt" afterDir="false" />
+      <change beforePath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/include/commands/command.h" beforeDir="false" afterPath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/include/commands/command.h" afterDir="false" />
+      <change beforePath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/include/commands/command_manager.h" beforeDir="false" afterPath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/include/commands/command_manager.h" afterDir="false" />
+      <change beforePath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/include/commands/disconnect_command.h" beforeDir="false" afterPath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/include/commands/disconnect_command.h" afterDir="false" />
+      <change beforePath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/include/commands/join_command.h" beforeDir="false" afterPath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/include/commands/join_command.h" afterDir="false" />
+      <change beforePath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/include/commands/ping_command.h" beforeDir="false" afterPath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/include/commands/ping_command.h" afterDir="false" />
+      <change beforePath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/include/commands/play_command.h" beforeDir="false" afterPath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/include/commands/play_command.h" afterDir="false" />
+      <change beforePath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/include/listeners/listener.h" beforeDir="false" afterPath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/include/listeners/listener.h" afterDir="false" />
+      <change beforePath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/src/commands/command_manager.cpp" beforeDir="false" afterPath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/src/commands/command_manager.cpp" afterDir="false" />
+      <change beforePath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/src/commands/disconnect_command.cpp" beforeDir="false" afterPath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/src/commands/disconnect_command.cpp" afterDir="false" />
+      <change beforePath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/src/commands/join_command.cpp" beforeDir="false" afterPath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/src/commands/join_command.cpp" afterDir="false" />
+      <change beforePath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/src/commands/ping_command.cpp" beforeDir="false" afterPath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/src/commands/ping_command.cpp" afterDir="false" />
+      <change beforePath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/src/commands/play_command.cpp" beforeDir="false" afterPath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/src/commands/play_command.cpp" afterDir="false" />
+      <change beforePath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/src/main.cpp" beforeDir="false" afterPath="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/src/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/commands/command.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/commands/command.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/commands/command_manager.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/commands/command_manager.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/commands/disconnect_command.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/commands/disconnect_command.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/commands/join_command.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/commands/join_command.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/commands/ping_command.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/commands/ping_command.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/commands/play_command.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/commands/play_command.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/listeners/listener.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/listeners/listener.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/command_manager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/command_manager.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/disconnect_command.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/disconnect_command.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/join_command.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/join_command.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/ping_command.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/ping_command.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/commands/play_command.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/commands/play_command.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file:////wsl$/Ubuntu/usr/include/dpp/cluster.h" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="ProjectApplicationVersion">
+    <option name="ide" value="CLion" />
+    <option name="majorVersion" value="2024" />
+    <option name="minorVersion" value="2.3" />
+    <option name="productBranch" value="Classic" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="2okXmAMwrDSUq1TyB2Sp5l1Gm6I" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.RadMigrateCodeStyle&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;RBranch&quot;,
+    &quot;last_opened_file_path&quot;: &quot;//wsl$/Ubuntu/home/buzi/lprog-hf-2024o-gyoma/src/listeners&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="\\wsl$\Ubuntu\home\buzi\lprog-hf-2024o-gyoma\src\listeners" />
+      <recent name="\\wsl$\Ubuntu\home\buzi\lprog-hf-2024o-gyoma\include\listeners" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="\\wsl$\Ubuntu\home\buzi\lprog-hf-2024o-gyoma\include" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="jocika" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="jocika" TARGET_NAME="jocika" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="jocika" RUN_TARGET_NAME="jocika">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="f26e1fb7-f281-45f5-97e5-a951e1f6f2b6" name="Changes" comment="" />
+      <created>1731414704876</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1731414704876</updated>
+      <workItem from="1731414706444" duration="502000" />
+      <workItem from="1731415216495" duration="8907000" />
+      <workItem from="1731436533504" duration="967000" />
+      <workItem from="1731500801970" duration="2522000" />
+      <workItem from="1731503627872" duration="6352000" />
+      <workItem from="1731511493244" duration="6688000" />
+      <workItem from="1731519504409" duration="20000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VCPKGProject">
+    <isAutomaticCheckingOnLaunch value="false" />
+    <isAutomaticFoundErrors value="true" />
+    <isAutomaticReloadCMake value="true" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>

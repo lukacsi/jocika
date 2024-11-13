@@ -2,6 +2,7 @@
 #define LISTENER_H
 
 #include <dpp/dpp.h>
+#include <globals.h>
 
 class Listener {
 public:

@@ -12,6 +12,9 @@ file(GLOB_RECURSE SOURCES
 
 add_executable(${PROJECT_NAME}
     ${SOURCES}
+        src/commands/slog_command.cpp
+        src/listeners/slog_listener.cpp
+        src/globals.cpp
 )
 
 find_package(DPP REQUIRED)

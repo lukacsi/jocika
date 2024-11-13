@@ -20,7 +20,9 @@
 #include <iostream>
 #include <memory>
 #include <string>
-
+#include <commands/slog_command.h>
+#include <listeners/slog_listener.h>
+#include <vector>
 
 int main(int argc, char* argv[]) {
     bool register_commands = false;
@@ -43,6 +45,7 @@ int main(int argc, char* argv[]) {
     dpp::cluster bot(token);
 
     bot.on_log(dpp::utility::cout_logger());
+    
 
     auto track_library = std::make_shared<TrackLibrary>();
     if (!track_library->init_tracks(media_dir)) {
@@ -66,12 +69,12 @@ int main(int argc, char* argv[]) {
     sharedCommandManager->add_command(std::make_unique<PauseCommand>(audio_processor, guild_audio_manager));
     sharedCommandManager->add_command(std::make_unique<ResumeCommand>(audio_processor, guild_audio_manager));
     sharedCommandManager->add_command(std::make_unique<LibraryCommand>(track_library));
-
-
+    sharedCommandManager->add_command(std::make_unique<SLogCommand>());
 
     auto listenerManager = std::make_unique<ListenerManager>();
     listenerManager->add_listener(std::make_unique<ReadyListener>(sharedCommandManager, register_commands));
     listenerManager->add_listener(std::make_unique<SlashCommandListener>(sharedCommandManager));
+    listenerManager->add_listener(std::make_unique<SLogListener>(sharedCommandManager));
 
     listenerManager->register_listeners(bot);
 
