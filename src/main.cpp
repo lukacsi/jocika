@@ -35,13 +35,12 @@ int main() {
     auto audio_processor = std::make_shared<Audio>(track_library);
     auto guild_audio_manager = std::make_shared<GuildAudioManager>(audio_processor, track_library);
 
-    audio_processor->set_guild_audio_manager(guild_audio_manager);
 
     auto sharedCommandManager = std::make_shared<CommandManager>();
     sharedCommandManager->add_command(std::make_unique<PingCommand>());
-    sharedCommandManager->add_command(std::make_unique<JoinCommand>());
-    sharedCommandManager->add_command(std::make_unique<DisconnectCommand>());
-    sharedCommandManager->add_command(std::make_unique<PlayCommand>(audio_processor));
+    sharedCommandManager->add_command(std::make_unique<JoinCommand>(audio_processor, guild_audio_manager));
+    sharedCommandManager->add_command(std::make_unique<DisconnectCommand>(audio_processor, guild_audio_manager));
+    sharedCommandManager->add_command(std::make_unique<PlayCommand>(audio_processor, guild_audio_manager));
 
     auto listenerManager = std::make_unique<ListenerManager>();
     listenerManager->add_listener(std::make_unique<ReadyListener>(sharedCommandManager));

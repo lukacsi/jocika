@@ -16,10 +16,9 @@ class Audio;
 struct GuildQueue {
     std::queue<std::string> tracks;
     bool is_playing;
+    bool stop;
     std::mutex queue_mutex;
-    dpp::voiceconn* voice_connection;
-
-    GuildQueue() : is_playing(false), voice_connection(nullptr) {}
+    GuildQueue() : is_playing(false), stop(false) {}
 };
 
 class GuildAudioManager {
@@ -33,11 +32,11 @@ public:
     void queue_track(dpp::snowflake guild_id, const std::string& track_name);
     void queue_all(dpp::snowflake guild_id);
     void skip_track(dpp::snowflake guild_id);
-
-    void set_voice_connection(dpp::snowflake guild_id, dpp::voiceconn* vc);
+    void remove_queue(dpp::snowflake guild_id);
+    void clear_queue(dpp::snowflake guild_id);
 
 private:
-    std::map<dpp::snowflake, std::unique_ptr<GuildQueue>> guild_queues;
+    std::map<dpp::snowflake, std::shared_ptr<GuildQueue>> guild_queues;
     std::mutex manager_mutex;
 
     std::shared_ptr<Audio> audio;
