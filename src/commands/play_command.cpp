@@ -15,9 +15,11 @@ void PlayCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& 
 
     dpp::guild* g = dpp::find_guild(guild_id);
 
-    // set up logic to determine if channel should be joined
-    audio_processor->join_voice(g, event.command.get_issuing_user().id);
-    audio_processor->set_voice_connection(guild_id, event.from->get_voice(guild_id));
+    auto vc = audio_processor->get_voice_connection(guild_id);
+    if (!vc) {
+        audio_processor->join_voice(g, event.command.get_issuing_user().id);
+        audio_processor->set_voice_connection(guild_id, event.from->get_voice(guild_id));
+    }
 
     if (file_specified) {
         guild_audio_manager->queue_track(guild_id, file_name);
