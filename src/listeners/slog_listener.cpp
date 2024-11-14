@@ -1,4 +1,5 @@
 #include "listeners/slog_listener.h"
+#include "globals.h"
 #include <memory>
 #include <fstream>
 
@@ -18,6 +19,8 @@ void SLogListener::register_listener(dpp::cluster& bot) {
     }
 
     bot.on_message_create([this,&pers_log](const dpp::message_create_t& event){
+        // Like this
+        bool log_message = Globals::get_instance().is_log_on(event.msg.author.id, event.msg.guild_id);
         if(pers_log.is_open()) {
             for(int i=0; i<go.get_v_size();i++){
                 if(event.msg.author == go.get_user(i) && event.msg.guild_id == go.get_guild(i)) {
