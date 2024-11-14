@@ -1,22 +1,23 @@
 #ifndef AUDIO_H
 #define AUDIO_H
 
-#include "utils/track_library.h"
+#include "track.h"
 #include <dpp/discordclient.h>
 #include <dpp/snowflake.h>
 #include <map>
-#include <memory>
 #include <mutex>
-#include <string>
 
 class Audio {
 public:
-    Audio(std::shared_ptr<TrackLibrary> _track_library);
+    Audio();
 
     Audio(const Audio&) = delete;
     Audio& operator=(const Audio&) = delete;
+    
+    //void recover_voice_connections(std::vector<dpp::snowflake> guild_ids);
 
-    void send_audio_to_voice(dpp::snowflake guild_id, const std::string& track_name);
+    bool voice_ready(dpp::snowflake guild_id);
+    void send_audio_to_voice(dpp::snowflake guild_id, std::shared_ptr<Track> track);
     void stop_audio(dpp::snowflake guild_id);
 
     void set_voice_connection(dpp::snowflake guild_id, dpp::voiceconn* vc);
@@ -27,8 +28,6 @@ public:
     void disconnect_voice(dpp::snowflake guild_id);
 
 private:
-    std::shared_ptr<TrackLibrary> track_library;
-
     std::map<dpp::snowflake, dpp::voiceconn*> voice_connections;
     std::mutex voice_mutex;
 };

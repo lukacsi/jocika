@@ -3,30 +3,63 @@
 #include "utils/track_library.h"
 #include <dpp/discordclient.h>
 #include <dpp/discordvoiceclient.h>
+#include <dpp/dispatcher.h>
+#include <dpp/snowflake.h>
 #include <opus/opus.h>
 #include <cstdint>
 #include <memory>
 #include <mpg123.h>
 #include <iostream>
 #include <ostream>
-#include <string>
 #include <vector>
 
-Audio::Audio(std::shared_ptr<TrackLibrary> _track_library) 
-    : track_library(_track_library) {}
+Audio::Audio() {}
 
+bool Audio::voice_ready(dpp::snowflake guild_id) {
+    std::lock_guard<std::mutex> lock(voice_mutex);
+    auto it = voice_connections.find(guild_id);
+    if (it == voice_connections.end() || !it->second) {
+        std::cerr << "[Audio] No active voice connections for guild " << guild_id << std::endl;
+        return false;
+    }
 
-void Audio::send_audio_to_voice(dpp::snowflake guild_id, const std::string& track_name) {
-    auto pcm_data = track_library->get_track(track_name)->get_pcm_data();
-    if (pcm_data.empty()) {
-        std::cerr << "[Audio] Track not found: " << track_name << std::endl;
+    if (!it->second->is_active() ) {
+        std::cerr << "[Audio] Voice connection for guild " << guild_id << " is not ready." << std::endl;
+        return false;
+    }
+
+    if (!it->second->voiceclient->is_ready()) {
+        std::cerr << "[Audio] Voice client for guild " << guild_id << " is not ready." << std::endl;
+        return false;
+    }
+
+    std::cout << "[Audio] Voice connection for guild " << guild_id << " is ready." << std::endl;
+    return true;
+}
+
+void Audio::send_audio_to_voice(dpp::snowflake guild_id, std::shared_ptr<Track> track) {
+    if (!track) {
+        std::cerr << "[Audio] Null track provided to send_audio_to_voice." << std::endl;
         return;
     }
+
+    auto pcm_data = track->get_pcm_data();
+    if (pcm_data.empty()) {
+        std::cerr << "[Audio] Track has no pcm data: " << track->get_name() << std::endl;
+        return;
+    }
+
     auto vc = get_voice_connection(guild_id);
     if (!vc) {
         std::cerr << "[Audio] Guild audio connection not found for " << guild_id << std::endl;
         return;
     }
+
+    if (pcm_data.size() % 2 != 0) {
+        std::cerr << "[Audio] PCM data size is not aligned to uint16_t: " << track->get_name() << std::endl;
+        return;
+    }
+    
     vc->voiceclient->send_audio_raw((uint16_t*)pcm_data.data(), pcm_data.size());
 } 
 
@@ -85,3 +118,6 @@ void Audio::remove_voice_connection(dpp::snowflake guild_id) {
         std::cout << "[Audio] Removed voice connection for guild " << guild_id << std::endl;
     }
 }
+
+/*void Audio::recover_voice_connections(std::vector<dpp::snowflake> guild_ids) {
+}*/

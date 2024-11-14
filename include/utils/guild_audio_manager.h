@@ -1,6 +1,7 @@
 #ifndef GUILD_AUDIO_MANAGER_H
 #define GUILD_AUDIO_MANAGER_H
 
+#include "utils/track.h"
 #include "utils/track_library.h"
 #include <condition_variable>
 #include <dpp/discordclient.h>
@@ -15,13 +16,14 @@
 class Audio;
 
 struct GuildQueue {
-    std::queue<std::string> tracks;
-    std::string current_track;
+    std::queue<std::shared_ptr<Track>> tracks;
+    std::shared_ptr<Track> current_track;
     bool is_playing;
     bool stop;
     bool skip;
     std::mutex queue_mutex;
-    GuildQueue() : is_playing(false), stop(false), skip(false) {}
+
+    GuildQueue() : is_playing(false), stop(false), skip(false), current_track(nullptr) {}
 };
 
 class GuildAudioManager {
@@ -59,7 +61,7 @@ private:
 
     void playback_loop();
 
-    GuildQueue* get_queue(dpp::snowflake guild_id);
+    std::shared_ptr<GuildQueue> get_queue(dpp::snowflake guild_id);
 };
 
 #endif

@@ -95,5 +95,5 @@ std::vector<std::string> TrackLibrary::get_all_track_names() const {
 }
 
 size_t TrackLibrary::get_length_ms(const std::string& name) const {
-    return get_track(name)->get_lenght();
+    return get_track(name)->get_length();
 }

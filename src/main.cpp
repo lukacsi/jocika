@@ -36,10 +36,11 @@ int main() {
         std::cerr << "Failed to load media, or media_dir empty" << std::endl;
     }
 
-    auto audio_processor = std::make_shared<Audio>(track_library);
+    auto audio_processor = std::make_shared<Audio>();
     auto guild_audio_manager = std::make_shared<GuildAudioManager>(audio_processor, track_library);
 
-
+    
+    // register commands
     auto sharedCommandManager = std::make_shared<CommandManager>();
     sharedCommandManager->add_command(std::make_unique<PingCommand>());
     sharedCommandManager->add_command(std::make_unique<JoinCommand>(audio_processor, guild_audio_manager));
