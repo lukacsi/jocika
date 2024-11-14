@@ -1,14 +1,14 @@
 #include "utils/track.h"
 #include <mpg123.h>
 #include <iostream>
+#include <vector>
 
 Track::Track(const std::string& _name, const std::string& _file_path)
     : name(_name), file_path(_file_path), length_ms(0), rate(0), channels(0), encoding(0) {}
 
 bool Track::load() {
     if (mpg123_init() != MPG123_OK) {
-        std::cerr << "[Track] Failed to initialize mpg123" << std::endl;
-        return false;
+        std::cerr << "[TrackLibrary] Failed to initialize mpg123" << std::endl;
     }
 
     mpg123_handle* mh = mpg123_new(NULL, NULL);
@@ -67,5 +67,12 @@ bool Track::load() {
     double duration_seconds = static_cast<double>(total_samples) / static_cast<double>(rate);
     length_ms = static_cast<size_t>(duration_seconds * 1000.0);
 
+    std::cout << "[Track] Track data loaded: " << name << std::endl;
+
     return true;
+}
+
+void Track::unload() {
+    pcm_data.clear();
+    std::cout << "[Track] Track data unloaded: " << name << std::endl;
 }

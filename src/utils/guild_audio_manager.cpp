@@ -28,17 +28,17 @@ GuildAudioManager::~GuildAudioManager() {
     }
 }
 
-void GuildAudioManager::queue_track(dpp::snowflake guild_id, const std::string& track_name) {
+std::string GuildAudioManager::queue_track(dpp::snowflake guild_id, const std::string& track_name) {
     auto guild_queue = get_queue(guild_id);
     if (!guild_queue) {
         std::cerr << "[GuildAudioManager] Failed to get or create queue for guild " << guild_id << std::endl;
-        return;
+        return "ERROR";
     }
 
     std::shared_ptr<Track> track = track_library->get_track(track_name);
     if (!track) {
         std::cerr << "[GuildAudioManager] Track '" << track_name << "' not found in library." << std::endl;
-        return;
+        return "ERROR";
     }
 
     {
@@ -47,6 +47,7 @@ void GuildAudioManager::queue_track(dpp::snowflake guild_id, const std::string& 
     }
     cv.notify_all();
     std::cout << "[GuildAudioManager] Queued track: " << track->get_name() << " in guild: " << guild_id << std::endl; 
+    return track->get_name();
 }
 
 void GuildAudioManager::queue_all(dpp::snowflake guild_id) {
@@ -184,9 +185,9 @@ void GuildAudioManager::playback_loop() {
                         guild_queue->tracks.pop();
                         guild_queue->is_playing = true;
                         guild_queue->skip = false;
+                        track->load();
                         std::cout << "[GuildAudioManager] playing track '" << guild_queue->current_track->get_name() << "' for guild " << guild_id << std::endl;
                         std::thread([this, guild_queue, track, guild_id]() {
-                           
                             audio->send_audio_to_voice(guild_id, track);
                             size_t length_ms = track->get_length();
                             size_t elapsed_ms = 0;
@@ -202,6 +203,7 @@ void GuildAudioManager::playback_loop() {
                                         std::cout << "[GuildAudioManager] Track skipped or stop requested: " << track->get_name() << std::endl;
                                         guild_queue->is_playing = false;
                                         cv.notify_all();
+                                        track->unload();
                                         return;
                                     }
                                 }
@@ -215,6 +217,7 @@ void GuildAudioManager::playback_loop() {
                             }
 
                             std::cout << "[GuildAudioManager] Finished playing track " << track->get_name() << std::endl;
+                            track->unload();
                             cv.notify_all();
                         }).detach();
                     }

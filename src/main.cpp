@@ -34,7 +34,7 @@ int main() {
     bot.on_log(dpp::utility::cout_logger());
 
     auto track_library = std::make_shared<TrackLibrary>();
-    if (!track_library->load_tracks(media_dir)) {
+    if (!track_library->init_tracks(media_dir)) {
         std::cerr << "Failed to load media, or media_dir empty" << std::endl;
     }
 
@@ -47,7 +47,7 @@ int main() {
     sharedCommandManager->add_command(std::make_unique<PingCommand>());
     sharedCommandManager->add_command(std::make_unique<JoinCommand>(audio_processor, guild_audio_manager));
     sharedCommandManager->add_command(std::make_unique<DisconnectCommand>(audio_processor, guild_audio_manager));
-    sharedCommandManager->add_command(std::make_unique<PlayCommand>(audio_processor, guild_audio_manager));
+    sharedCommandManager->add_command(std::make_unique<PlayCommand>(audio_processor, guild_audio_manager/*, track_library*/));
     sharedCommandManager->add_command(std::make_unique<SkipCommand>(audio_processor, guild_audio_manager));
     sharedCommandManager->add_command(std::make_unique<StopCommand>(audio_processor, guild_audio_manager));
     sharedCommandManager->add_command(std::make_unique<QueueCommand>(audio_processor, guild_audio_manager));

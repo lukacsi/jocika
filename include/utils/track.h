@@ -13,6 +13,7 @@ public:
     Track(const std::string& _name, const std::string& _file_path);
 
     bool load();
+    void unload();
 
     const std::string& get_name() { return name ;}
     const std::vector<uint8_t> get_pcm_data() { return pcm_data; }

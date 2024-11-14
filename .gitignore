@@ -7,3 +7,4 @@ cmake/FindOpus.cmake
 cmake/Makefile
 cmake/cmake_install.cmake
 cmake/jocika
+media

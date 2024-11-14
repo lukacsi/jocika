@@ -14,8 +14,9 @@ class Track;
 class TrackLibrary {
 public:
     TrackLibrary();
+    ~TrackLibrary();
 
-    bool load_tracks(const std::string& media_dir);
+    bool init_tracks(const std::string& media_dir);
     bool add_track(const std::string& name, const std::string& file_path);
     bool remove_track(const std::string& name);
 

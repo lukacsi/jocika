@@ -1,11 +1,25 @@
 #include "utils/track_library.h"
 #include <filesystem>
 #include <iostream>
+#include <mpg123.h>
 #include <mutex>
+#include <vector>
 
-TrackLibrary::TrackLibrary() {};
+TrackLibrary::TrackLibrary() {}
+TrackLibrary::~TrackLibrary() {}
 
-bool TrackLibrary::load_tracks(const std::string& media_dir) {
+std::string to_lower(const std::string& str) {
+    std::string lower_str;
+    lower_str.reserve(str.size());
+
+    for (char c : str) {
+        lower_str += std::tolower(static_cast<unsigned char>(c));
+    }
+
+    return lower_str;
+}
+
+bool TrackLibrary::init_tracks(const std::string& media_dir) {
     std::lock_guard<std::mutex> lock(tracks_mutex);
     bool any_loaded = false;
 
@@ -21,21 +35,22 @@ bool TrackLibrary::load_tracks(const std::string& media_dir) {
 
             std::shared_ptr<Track> track = std::make_shared<Track>(track_name, file_path);
             if (track->load()) {
+                track->unload();
                 tracks[track_name] = track;
                 any_loaded = true;
-                std::cout << "[TrackLibrary] Audio file loaded: " << track_name << std::endl;
+                std::cout << "[TrackLibrary] Audio file initialized: " << track_name << std::endl;
             }
             else {
-                std::cerr << "[TrackLibrary] Failed to load track: " << track_name << std::endl;
+                std::cerr << "[TrackLibrary] Failed to initialize track: " << track_name << std::endl;
             }
         }
     }
 
     if (!any_loaded) {
-        std::cerr << "[TrackLibrary] No tracks loaded from directory: " << media_dir << std::endl;
+        std::cerr << "[TrackLibrary] No tracks initialized from directory: " << media_dir << std::endl;
     }
     else {
-        std::cout << "[TrackLibrary] Successfully loaded tracks from directory: " << media_dir << std::endl;
+        std::cout << "[TrackLibrary] Successfully initialized tracks from directory: " << media_dir << std::endl;
     }
 
     return any_loaded;
@@ -51,8 +66,9 @@ bool TrackLibrary::add_track(const std::string& name, const std::string& file_pa
 
     std::shared_ptr<Track> track = std::make_shared<Track>(name, file_path);
     if (track->load()) {
+        track->unload();
         tracks[name] = track;
-        std::cout << "[TrackLibrary] Added and loaded track: " << name << std::endl;
+        std::cout << "[TrackLibrary] Added track: " << name << std::endl;
         return true;
     }
     else {
@@ -76,15 +92,6 @@ bool TrackLibrary::remove_track(const std::string& name) {
     }
 }
 
-std::shared_ptr<Track> TrackLibrary::get_track(const std::string& name) const {
-    std::lock_guard<std::mutex> lock(tracks_mutex);
-    auto it = tracks.find(name);
-    if (it != tracks.end()) {
-        return it->second;
-    }
-    return nullptr;
-}
-
 std::vector<std::string> TrackLibrary::get_all_track_names() const {
     std::lock_guard<std::mutex> lock(tracks_mutex);
     std::vector<std::string> track_names;
@@ -94,6 +101,42 @@ std::vector<std::string> TrackLibrary::get_all_track_names() const {
     return track_names;
 }
 
+std::shared_ptr<Track> TrackLibrary::get_track(const std::string& name) const {
+    std::vector<std::string> names;
+
+    {
+        std::lock_guard<std::mutex> lock(tracks_mutex);
+
+        auto it = tracks.find(name);
+        if (it != tracks.end()) {
+            return it->second;
+        }
+
+        names.reserve(tracks.size());
+        for (const auto& [track_name, _] : tracks) {
+            names.push_back(track_name);
+        }
+    }
+
+    std::string lower_name = to_lower(name);
+
+    for (const auto& o_name : names) {
+        std::string lower_o_name = to_lower(o_name);
+        if (lower_o_name.find(lower_name) != std::string::npos) {
+            std::lock_guard<std::mutex> lock(tracks_mutex);
+            auto it = tracks.find(o_name);
+            if (it != tracks.end()) {
+                return it->second;
+            }
+            // If the track was removed after copying names, continue searching
+        }
+    }
+
+    return nullptr;
+}
+
+
 size_t TrackLibrary::get_length_ms(const std::string& name) const {
     return get_track(name)->get_length();
 }
+

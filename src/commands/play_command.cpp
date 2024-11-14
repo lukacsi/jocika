@@ -22,8 +22,8 @@ void PlayCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& 
     }
 
     if (file_specified) {
-        guild_audio_manager->queue_track(guild_id, file_name);
-        event.reply("Queued track: " + file_name);
+        auto track = guild_audio_manager->queue_track(guild_id, file_name);
+        event.reply("Queued track: " + track);
     } else {
         guild_audio_manager->queue_all(guild_id);
         event.reply("Queued all tracks in library");
