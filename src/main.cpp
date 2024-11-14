@@ -1,10 +1,12 @@
 #include "commands/clear_command.h"
 #include "commands/command_manager.h"
 #include "commands/join_command.h"
+#include "commands/pause_command.h"
 #include "commands/ping_command.h"
 #include "commands/disconnect_command.h"
 #include "commands/play_command.h"
 #include "commands/queue_command.h"
+#include "commands/resume_command.h"
 #include "commands/skip_command.h"
 #include "commands/stop_command.h"
 #include "listeners/listener_manager.h"
@@ -50,6 +52,10 @@ int main() {
     sharedCommandManager->add_command(std::make_unique<StopCommand>(audio_processor, guild_audio_manager));
     sharedCommandManager->add_command(std::make_unique<QueueCommand>(audio_processor, guild_audio_manager));
     sharedCommandManager->add_command(std::make_unique<ClearCommand>(audio_processor, guild_audio_manager));
+    sharedCommandManager->add_command(std::make_unique<PauseCommand>(audio_processor, guild_audio_manager));
+    sharedCommandManager->add_command(std::make_unique<ResumeCommand>(audio_processor, guild_audio_manager));
+
+
 
     auto listenerManager = std::make_unique<ListenerManager>();
     listenerManager->add_listener(std::make_unique<ReadyListener>(sharedCommandManager));

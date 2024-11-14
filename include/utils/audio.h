@@ -19,6 +19,8 @@ public:
     bool voice_ready(dpp::snowflake guild_id);
     void send_audio_to_voice(dpp::snowflake guild_id, std::shared_ptr<Track> track);
     void stop_audio(dpp::snowflake guild_id);
+    void pause_audio(dpp::snowflake guild_id);
+    void resume_audio(dpp::snowflake guild_id);
 
     void set_voice_connection(dpp::snowflake guild_id, dpp::voiceconn* vc);
     dpp::voiceconn* get_voice_connection(dpp::snowflake guild_id);

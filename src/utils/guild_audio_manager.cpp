@@ -91,6 +91,39 @@ void GuildAudioManager::skip_track(dpp::snowflake guild_id) {
     cv.notify_all();
 }
 
+void GuildAudioManager::pause_track(dpp::snowflake guild_id) {
+    auto guild_queue = get_queue(guild_id);
+    if (!guild_queue) {
+        std::cerr << "[GuildAudioManager] No queue found for guild " << guild_id << std::endl;
+        return;
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(guild_queue->queue_mutex);
+        if (guild_queue->is_playing && !guild_queue->paused) {
+            guild_queue->paused = true;
+            std::cout << "[GuildAudioManager] Paused track for guild " << guild_id << std::endl;
+        }
+    }
+}
+
+void GuildAudioManager::resume_track(dpp::snowflake guild_id) {
+    auto guild_queue = get_queue(guild_id);
+    if (!guild_queue) {
+        std::cerr << "[GuildAudioManager] No queue found for guild " << guild_id << std::endl;
+        return;
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(guild_queue->queue_mutex);
+        if (guild_queue->is_playing && guild_queue->paused) {
+            guild_queue->paused = false;
+            std::cout << "[GuildAudioManager] Resumed track for guild " << guild_id << std::endl;
+        }
+    }
+    cv.notify_all();
+}
+
 void GuildAudioManager::clear_queue(dpp::snowflake guild_id) {
     std::shared_ptr<GuildQueue> guild_queue;
     {
@@ -129,12 +162,11 @@ void GuildAudioManager::playback_loop() {
                 auto guild_id = it->first;
                 std::shared_ptr<GuildQueue> guild_queue = it->second;
 
-                // Check if exit was requested
                 {
                     std::lock_guard<std::mutex> queue_lock(guild_queue->queue_mutex);
                     if (guild_queue->stop) {
                         std::cout << "[GuildAudioManager] Exit requested for guild " << guild_id << std::endl;
-                        it = guild_queues.erase(it); // Remove the queue and exit the loop
+                        it = guild_queues.erase(it);
                         continue;
                     }
                 }
@@ -153,7 +185,6 @@ void GuildAudioManager::playback_loop() {
                         guild_queue->is_playing = true;
                         guild_queue->skip = false;
                         std::cout << "[GuildAudioManager] playing track '" << guild_queue->current_track->get_name() << "' for guild " << guild_id << std::endl;
-                        // Send audio in a detached thread
                         std::thread([this, guild_queue, track, guild_id]() {
                            
                             audio->send_audio_to_voice(guild_id, track);
@@ -162,13 +193,19 @@ void GuildAudioManager::playback_loop() {
                             
                             while (elapsed_ms < length_ms) {
                                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
-                                elapsed_ms += 100;
-                                if (guild_queue->skip || guild_queue->stop) {
-                                    std::cout << "[GuildAudioManager] Track skipped or stop requested: " << track->get_name() << std::endl;
-                                    guild_queue->is_playing = false;
-                                    cv.notify_all();
-                                    return;
+                                {
+                                    std::unique_lock<std::mutex> lock(guild_queue->queue_mutex);
+                                    if (guild_queue->paused) {
+                                        cv.wait(lock, [&guild_queue]() { return !guild_queue->paused || guild_queue->stop || guild_queue->skip; });
+                                    }
+                                    if (guild_queue->skip || guild_queue->stop) {
+                                        std::cout << "[GuildAudioManager] Track skipped or stop requested: " << track->get_name() << std::endl;
+                                        guild_queue->is_playing = false;
+                                        cv.notify_all();
+                                        return;
+                                    }
                                 }
+                                elapsed_ms += 100;
                             }
                             if (guild_queue) {
                                 std::lock_guard<std::mutex> lock(guild_queue->queue_mutex);

@@ -21,9 +21,10 @@ struct GuildQueue {
     bool is_playing;
     bool stop;
     bool skip;
+    bool paused;
     std::mutex queue_mutex;
 
-    GuildQueue() : is_playing(false), stop(false), skip(false), current_track(nullptr) {}
+    GuildQueue() : is_playing(false), stop(false), skip(false), paused(false), current_track(nullptr) {}
 };
 
 class GuildAudioManager {
@@ -38,6 +39,8 @@ public:
     void queue_all(dpp::snowflake guild_id);
 
     void skip_track(dpp::snowflake guild_id);
+    void pause_track(dpp::snowflake guild_id);
+    void resume_track(dpp::snowflake guild_id);
 
     //void remove_queue(dpp::snowflake guild_id);
     void clear_queue(dpp::snowflake guild_id);

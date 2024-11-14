@@ -92,6 +92,28 @@ void Audio::stop_audio(dpp::snowflake guild_id) {
     std::cout << "[Audio] stopped playback for " << guild_id << std::endl;
 }
 
+void Audio::pause_audio(dpp::snowflake guild_id) {
+    auto vc = get_voice_connection(guild_id);
+    if (!vc) {
+        std::cerr << "[Audio] No active voice connections for guild " << guild_id << std::endl;
+        return;
+    }
+
+    vc->voiceclient->pause_audio(true);
+    std::cout << "[Audio] Paused playback for " << guild_id << std::endl;
+}
+
+void Audio::resume_audio(dpp::snowflake guild_id) {
+    auto vc = get_voice_connection(guild_id);
+    if (!vc) {
+        std::cerr << "[Audio] No active voice connections for guild " << guild_id << std::endl;
+        return;
+    }
+
+    vc->voiceclient->pause_audio(false);
+    std::cout << "[Audio] Resumed playback for " << guild_id << std::endl;
+}
+
 void Audio::set_voice_connection(dpp::snowflake guild_id, dpp::voiceconn* vc) {
     std::lock_guard<std::mutex> lock(voice_mutex);
     voice_connections[guild_id] = vc;
