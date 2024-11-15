@@ -1,6 +1,9 @@
 #include "utils/audio.h"
 #include "utils/guild_audio_manager.h"
+#include "utils/process.h"
 #include "utils/track_library.h"
+#include <array>
+#include <cstdio>
 #include <dpp/discordclient.h>
 #include <dpp/discordvoiceclient.h>
 #include <dpp/dispatcher.h>
@@ -37,15 +40,10 @@ bool Audio::voice_ready(dpp::snowflake guild_id) {
     return true;
 }
 
-void Audio::send_audio_to_voice(dpp::snowflake guild_id, std::shared_ptr<Track> track) {
+void Audio::send_audio_to_voice(dpp::snowflake guild_id, std::shared_ptr<Track> track,
+                                std::function<bool()> stop_callback, std::function<bool()> pause_callback) {
     if (!track) {
         std::cerr << "[Audio] Null track provided to send_audio_to_voice." << std::endl;
-        return;
-    }
-
-    auto pcm_data = track->get_pcm_data();
-    if (pcm_data.empty()) {
-        std::cerr << "[Audio] Track has no pcm data: " << track->get_name() << std::endl;
         return;
     }
 
@@ -54,15 +52,82 @@ void Audio::send_audio_to_voice(dpp::snowflake guild_id, std::shared_ptr<Track> 
         std::cerr << "[Audio] Guild audio connection not found for " << guild_id << std::endl;
         return;
     }
-
-    if (pcm_data.size() % 2 != 0) {
-        std::cerr << "[Audio] PCM data size is not aligned to uint16_t: " << track->get_name() << std::endl;
-        return;
+    if (track->get_source_type() == SourceType::Youtube) {
+        std::thread([this, vc, track, stop_callback, pause_callback]() {
+            send_stream_audio(vc, track->get_source(), stop_callback, pause_callback);
+        }).detach();
+    } else {
+        // Handle local files with pause and resume
+        send_local_audio(vc, track, stop_callback, pause_callback);
     }
-    
-    vc->voiceclient->send_audio_raw((uint16_t*)pcm_data.data(), pcm_data.size());
 } 
 
+void Audio::send_stream_audio(dpp::voiceconn* vc, const std::string& url,
+                                  std::function<bool()> stop_callback, std::function<bool()> pause_callback) {
+    std::vector<std::string> command = {
+        "bash", "-c",
+        "yt-dlp -f bestaudio -o - \"" + url + "\" | ffmpeg -i pipe:0 -map 0:a -c:a copy -f opus -loglevel quiet pipe:1"
+    };
+
+    Process process(command);
+    if (!process.start()) {
+        std::cerr << "[Audio] Failed to start process for streaming audio." << std::endl;
+        return;
+    }
+
+    std::array<uint8_t, 4096> buffer;
+    bool paused = false;
+
+    while (true) {
+        if (stop_callback()) {
+            std::cout << "[Audio] Stopping streaming as per control callback." << std::endl;
+            break;
+        }
+
+        if (pause_callback()) {
+            if (!paused) {
+                process.stop();
+                paused = true;
+                std::cout << "[Audio] Paused streaming." << std::endl;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            continue;
+        } else {
+            if (paused) {
+                process.resume();
+                paused = false;
+                std::cout << "[Audio] Resumed streaming." << std::endl;
+            }
+        }
+
+        ssize_t bytes_read = process.read(reinterpret_cast<char*>(buffer.data()), buffer.size());
+        if (bytes_read <= 0) {
+            break;  // End of stream or error
+        }
+
+        try {
+            vc->voiceclient->send_audio_opus(buffer.data(), bytes_read, 20);
+        } catch (const dpp::voice_exception& e) {
+            std::cerr << "[Audio] Error sending audio: " << e.what() << std::endl;
+            break;
+        }
+    }
+
+    process.terminate();
+    vc->voiceclient->stop_audio();    
+}
+
+void Audio::send_local_audio(dpp::voiceconn* vc, std::shared_ptr<Track> track,
+                             std::function<bool()> stop_callback,
+                             std::function<bool()> pause_callback) {
+    track->load();
+    auto pcm_data = track->get_pcm_data();
+    if (pcm_data.empty()) {
+        std::cerr << "[Audio] Track has no PCM data: " << track->get_name() << std::endl;
+        return;
+    }
+    vc->voiceclient->send_audio_raw(reinterpret_cast<uint16_t*>(pcm_data.data()), pcm_data.size());
+}
 void Audio::join_voice(dpp::guild* guild, dpp::snowflake user_id) {
     if (!guild->connect_member_voice(user_id)) {
         std::cout << "[Audio] User is not in a voice channel " << user_id << std::endl;

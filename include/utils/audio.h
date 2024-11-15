@@ -17,7 +17,16 @@ public:
     //void recover_voice_connections(std::vector<dpp::snowflake> guild_ids);
 
     bool voice_ready(dpp::snowflake guild_id);
-    void send_audio_to_voice(dpp::snowflake guild_id, std::shared_ptr<Track> track);
+    void send_audio_to_voice(dpp::snowflake guild_id, std::shared_ptr<Track> track,
+                             std::function<bool()> stop_callback,
+                             std::function<bool()> pause_callback);
+    void send_stream_audio(dpp::voiceconn* vc, const std::string& url,
+                           std::function<bool()> stop_callback,
+                           std::function<bool()> pause_callback);
+    void send_local_audio(dpp::voiceconn* vc, std::shared_ptr<Track> track,
+                             std::function<bool()> stop_callback,
+                             std::function<bool()> pause_callback);
+
     void stop_audio(dpp::snowflake guild_id);
     void pause_audio(dpp::snowflake guild_id);
     void resume_audio(dpp::snowflake guild_id);

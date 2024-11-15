@@ -3,14 +3,21 @@
 #include <dpp/guild.h>
 #include <string>
 #include <unistd.h>
+#include <variant>
 
 void PlayCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& bot) {
     auto guild_id = event.command.guild_id;
-    std::string file_name;
-    bool file_specified = false;
+    std::string source;
+    bool source_specified = false;
     if (std::holds_alternative<std::string>(event.get_parameter("file"))) {
-        file_name = std::get<std::string>(event.get_parameter("file"));
-        file_specified = true;
+        source = std::get<std::string>(event.get_parameter("file"));
+        source_specified = true;
+    }
+    bool url = false;
+    if(std::holds_alternative<std::string>(event.get_parameter("url"))) {
+        source = std::get<std::string>(event.get_parameter("url"));
+        source_specified = true;
+        url = true;
     }
 
     dpp::guild* g = dpp::find_guild(guild_id);
@@ -22,9 +29,20 @@ void PlayCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& 
     }
     
     // pass tracks directry TODO
-    if (file_specified) {
-        auto track = guild_audio_manager->queue_track(guild_id, file_name);
-        event.reply("Queued track: " + track);
+    if (source_specified) {
+        if (url) {
+            track_library->add_track(source, source, SourceType::Youtube);
+        }
+        auto tracks = guild_audio_manager->queue_track(guild_id, source);
+        std::string reply = "Multiple tracks found:\n";
+        if(tracks.size() > 1) {
+            for (const auto& track : tracks) {
+                reply += track->get_name() + '\n';
+            }
+            event.reply(reply);
+            return;
+        }
+        event.reply("Queued track: " + tracks[0]->get_name());
     } else {
         guild_audio_manager->queue_all(guild_id);
         event.reply("Queued all tracks in library");

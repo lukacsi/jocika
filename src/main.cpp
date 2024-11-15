@@ -48,7 +48,7 @@ int main() {
     sharedCommandManager->add_command(std::make_unique<PingCommand>());
     sharedCommandManager->add_command(std::make_unique<JoinCommand>(audio_processor, guild_audio_manager));
     sharedCommandManager->add_command(std::make_unique<DisconnectCommand>(audio_processor, guild_audio_manager));
-    sharedCommandManager->add_command(std::make_unique<PlayCommand>(audio_processor, guild_audio_manager/*, track_library*/));
+    sharedCommandManager->add_command(std::make_unique<PlayCommand>(audio_processor, guild_audio_manager, track_library));
     sharedCommandManager->add_command(std::make_unique<SkipCommand>(audio_processor, guild_audio_manager));
     sharedCommandManager->add_command(std::make_unique<StopCommand>(audio_processor, guild_audio_manager));
     sharedCommandManager->add_command(std::make_unique<QueueCommand>(audio_processor, guild_audio_manager));

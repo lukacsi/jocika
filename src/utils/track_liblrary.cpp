@@ -34,7 +34,7 @@ bool TrackLibrary::init_tracks(const std::string& media_dir) {
                 continue;
             }
 
-            std::shared_ptr<Track> track = std::make_shared<Track>(track_name, file_path);
+            std::shared_ptr<Track> track = std::make_shared<Track>(track_name, file_path, SourceType::Local);
             if (track->load()) {
                 track->unload();
                 tracks[track_name] = track;
@@ -57,7 +57,7 @@ bool TrackLibrary::init_tracks(const std::string& media_dir) {
     return any_loaded;
 }
 
-bool TrackLibrary::add_track(const std::string& name, const std::string& file_path) {
+bool TrackLibrary::add_track(const std::string& name, const std::string& source, SourceType source_type) {
     std::lock_guard<std::mutex> lock(tracks_mutex);
 
     if (tracks.find(name) != tracks.end()) {
@@ -65,7 +65,11 @@ bool TrackLibrary::add_track(const std::string& name, const std::string& file_pa
         return false;
     }
 
-    std::shared_ptr<Track> track = std::make_shared<Track>(name, file_path);
+    std::shared_ptr<Track> new_track = std::make_shared<Track>(name, source, source_type);
+    tracks[name] = new_track;
+    std::cout << "[TrackLibrary] Added track: " << name << " with source_type: " << ((source_type==SourceType::Youtube)?"Youtube":"Local") << std::endl;
+    return true;
+    /*std::shared_ptr<Track> track = std::make_shared<Track>(name, file_path);
     if (track->load()) {
         track->unload();
         tracks[name] = track;
@@ -75,7 +79,7 @@ bool TrackLibrary::add_track(const std::string& name, const std::string& file_pa
     else {
         std::cerr << "[TrackLibrary] Failed to load track: " << name << std::endl;
         return false;
-    }
+    }*/
 }
 
 bool TrackLibrary::remove_track(const std::string& name) {
@@ -108,7 +112,8 @@ std::shared_ptr<Track> TrackLibrary::get_track(const std::string& name) const {
     auto it = tracks.find(name);
     if (it != tracks.end()) {
         return it->second;
-    }    return nullptr;
+    }
+    return nullptr;
 }
 
 std::vector<std::shared_ptr<Track>> TrackLibrary::get_all_matching_tracks(const std::string& name) const {
