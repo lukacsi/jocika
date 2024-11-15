@@ -20,7 +20,8 @@ void PlayCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& 
         audio_processor->join_voice(g, event.command.get_issuing_user().id);
         audio_processor->set_voice_connection(guild_id, event.from->get_voice(guild_id));
     }
-
+    
+    // pass tracks directry TODO
     if (file_specified) {
         auto track = guild_audio_manager->queue_track(guild_id, file_name);
         event.reply("Queued track: " + track);

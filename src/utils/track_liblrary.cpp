@@ -1,6 +1,7 @@
 #include "utils/track_library.h"
 #include <filesystem>
 #include <iostream>
+#include <memory>
 #include <mpg123.h>
 #include <mutex>
 #include <vector>
@@ -101,17 +102,21 @@ std::vector<std::string> TrackLibrary::get_all_track_names() const {
     return track_names;
 }
 
+
 std::shared_ptr<Track> TrackLibrary::get_track(const std::string& name) const {
+    std::lock_guard<std::mutex> lock(tracks_mutex);
+    auto it = tracks.find(name);
+    if (it != tracks.end()) {
+        return it->second;
+    }    return nullptr;
+}
+
+std::vector<std::shared_ptr<Track>> TrackLibrary::get_all_matching_tracks(const std::string& name) const {
+    std::vector<std::shared_ptr<Track>> matching_tracks;
     std::vector<std::string> names;
 
     {
         std::lock_guard<std::mutex> lock(tracks_mutex);
-
-        auto it = tracks.find(name);
-        if (it != tracks.end()) {
-            return it->second;
-        }
-
         names.reserve(tracks.size());
         for (const auto& [track_name, _] : tracks) {
             names.push_back(track_name);
@@ -126,13 +131,21 @@ std::shared_ptr<Track> TrackLibrary::get_track(const std::string& name) const {
             std::lock_guard<std::mutex> lock(tracks_mutex);
             auto it = tracks.find(o_name);
             if (it != tracks.end()) {
-                return it->second;
+                matching_tracks.push_back(it->second);
             }
-            // If the track was removed after copying names, continue searching
         }
     }
 
-    return nullptr;
+    return matching_tracks;
+}
+
+std::vector<std::shared_ptr<Track>> TrackLibrary::get_all_tracks() const {
+    std::lock_guard<std::mutex> lock(tracks_mutex);
+    std::vector<std::shared_ptr<Track>> s_tracks;
+    for (const auto& [name, track] : tracks) {
+        s_tracks.push_back(track);
+    }
+    return s_tracks;
 }
 
 
