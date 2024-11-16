@@ -1,8 +1,7 @@
 #include "utils/audio.h"
+#include "globals.h"
 #include "utils/guild_audio_manager.h"
-#include "utils/process.h"
 #include "utils/track_library.h"
-#include <array>
 #include <cstdio>
 #include <dpp/discordclient.h>
 #include <dpp/discordvoiceclient.h>
@@ -54,72 +53,66 @@ void Audio::send_audio_to_voice(dpp::snowflake guild_id, std::shared_ptr<Track> 
     }
     if (track->get_source_type() == SourceType::Youtube) {
         std::thread([this, vc, track, stop_callback, pause_callback]() {
-            send_stream_audio(vc, track->get_source(), stop_callback, pause_callback);
+            send_stream_audio(vc, track, stop_callback, pause_callback);
         }).detach();
     } else {
-        // Handle local files with pause and resume
-        send_local_audio(vc, track, stop_callback, pause_callback);
+        send_local_audio(vc, track);
     }
 } 
 
-void Audio::send_stream_audio(dpp::voiceconn* vc, const std::string& url,
+void Audio::send_stream_audio(dpp::voiceconn* vc, std::shared_ptr<Track> track,
                                   std::function<bool()> stop_callback, std::function<bool()> pause_callback) {
-    std::vector<std::string> command = {
-        "bash", "-c",
-        "yt-dlp -f bestaudio -o - \"" + url + "\" | ffmpeg -i pipe:0 -map 0:a -c:a copy -f opus -loglevel quiet pipe:1"
-    };
+    auto best_format = track->get_best_format();
+    auto source = track->get_source();
 
-    Process process(command);
-    if (!process.start()) {
+    std::string ffmpeg_input_format;
+
+    // Example: format_code 251,250,249 are usually webm/opus
+    if (best_format == "251" || best_format == "250" || best_format == "249") {
+        ffmpeg_input_format = "webm";
+    }
+    // format_code 140 is m4a
+    else if (best_format == "140") {
+        ffmpeg_input_format = "m4a";
+    } else {
+        return;
+    }
+
+    std::string command = "yt-dlp --cookies \"" + cookies_path + "\" --quiet --no-warnings --no-progress -f " + best_format + " -o - '" + source + "' | ffmpeg -hide_banner -loglevel quiet -f " + ffmpeg_input_format + " -i - -f s16le -ar 48000 -ac 2 -";
+   
+    FILE *read_stream = popen(command.c_str(), "r");
+
+    if (!read_stream) {
         std::cerr << "[Audio] Failed to start process for streaming audio." << std::endl;
         return;
     }
 
-    std::array<uint8_t, 4096> buffer;
-    bool paused = false;
+    constexpr size_t bufsize = dpp::send_audio_raw_max_length;
 
-    while (true) {
-        if (stop_callback()) {
-            std::cout << "[Audio] Stopping streaming as per control callback." << std::endl;
-            break;
-        }
+    char buf[bufsize];
+    ssize_t buf_read = 0;
+    ssize_t current_read = 0;
 
-        if (pause_callback()) {
-            if (!paused) {
-                process.stop();
-                paused = true;
-                std::cout << "[Audio] Paused streaming." << std::endl;
-            }
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            continue;
-        } else {
-            if (paused) {
-                process.resume();
-                paused = false;
-                std::cout << "[Audio] Resumed streaming." << std::endl;
-            }
-        }
+    while ((current_read = fread(buf + buf_read, 1, bufsize - buf_read, read_stream)) > 0) {
+        buf_read += current_read;
 
-        ssize_t bytes_read = process.read(reinterpret_cast<char*>(buffer.data()), buffer.size());
-        if (bytes_read <= 0) {
-            break;  // End of stream or error
-        }
-
-        try {
-            vc->voiceclient->send_audio_opus(buffer.data(), bytes_read, 20);
-        } catch (const dpp::voice_exception& e) {
-            std::cerr << "[Audio] Error sending audio: " << e.what() << std::endl;
-            break;
+        // queue buffer only when it's exactly `bufsize` size
+        if (buf_read == bufsize) {
+            vc->voiceclient->send_audio_raw((uint16_t *)buf, buf_read);
+            buf_read = 0;
         }
     }
 
-    process.terminate();
-    vc->voiceclient->stop_audio();    
+    if (buf_read > 0) {
+        vc->voiceclient->send_audio_raw((uint16_t *)buf, buf_read);
+        buf_read = 0;
+    }
+
+    pclose(read_stream);
+    read_stream = NULL;
 }
 
-void Audio::send_local_audio(dpp::voiceconn* vc, std::shared_ptr<Track> track,
-                             std::function<bool()> stop_callback,
-                             std::function<bool()> pause_callback) {
+void Audio::send_local_audio(dpp::voiceconn* vc, std::shared_ptr<Track> track) {
     track->load();
     auto pcm_data = track->get_pcm_data();
     if (pcm_data.empty()) {
@@ -128,6 +121,7 @@ void Audio::send_local_audio(dpp::voiceconn* vc, std::shared_ptr<Track> track,
     }
     vc->voiceclient->send_audio_raw(reinterpret_cast<uint16_t*>(pcm_data.data()), pcm_data.size());
 }
+
 void Audio::join_voice(dpp::guild* guild, dpp::snowflake user_id) {
     if (!guild->connect_member_voice(user_id)) {
         std::cout << "[Audio] User is not in a voice channel " << user_id << std::endl;

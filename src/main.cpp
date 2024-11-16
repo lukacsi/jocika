@@ -22,7 +22,17 @@
 #include <string>
 
 
-int main() {
+int main(int argc, char* argv[]) {
+    bool register_commands = false;
+
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+
+        if (arg == "init") {
+            register_commands = true;
+        }
+    }
+
     const std::string media_dir = "./media";
     const char* token_env = std::getenv("DISCORD_BOT_TOKEN");
     if(!token_env) {
@@ -60,7 +70,7 @@ int main() {
 
 
     auto listenerManager = std::make_unique<ListenerManager>();
-    listenerManager->add_listener(std::make_unique<ReadyListener>(sharedCommandManager));
+    listenerManager->add_listener(std::make_unique<ReadyListener>(sharedCommandManager, register_commands));
     listenerManager->add_listener(std::make_unique<SlashCommandListener>(sharedCommandManager));
 
     listenerManager->register_listeners(bot);

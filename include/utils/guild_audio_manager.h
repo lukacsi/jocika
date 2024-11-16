@@ -9,22 +9,22 @@
 #include <map>
 #include <memory>
 #include <mutex>
-#include <queue>
 #include <thread>
 #include <vector>
 
 class Audio;
 
 struct GuildQueue {
-    std::queue<std::shared_ptr<Track>> tracks;
+    std::deque<std::shared_ptr<Track>> tracks;
     std::shared_ptr<Track> current_track;
+    size_t elapsed;
     bool is_playing;
     bool stop;
     bool skip;
     bool paused;
     std::mutex queue_mutex;
 
-    GuildQueue() : is_playing(false), stop(false), skip(false), paused(false), current_track(nullptr) {}
+    GuildQueue() : is_playing(false), stop(false), skip(false), paused(false), current_track(nullptr), elapsed(0) {}
 };
 
 class GuildAudioManager {
@@ -36,7 +36,10 @@ public:
     GuildAudioManager& operator=(const GuildAudioManager&) = delete;
 
     std::vector<std::shared_ptr<Track>> queue_track(dpp::snowflake guild_id, const std::string& track_name);
+    std::vector<std::shared_ptr<Track>> queue_track_top(dpp::snowflake, const std::string& track_name);
     void queue_all(dpp::snowflake guild_id);
+
+    bool move_track(dpp::snowflake guild_id, size_t from_pos, size_t to_pos);
 
     void skip_track(dpp::snowflake guild_id);
     void pause_track(dpp::snowflake guild_id);

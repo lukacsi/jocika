@@ -35,8 +35,7 @@ bool TrackLibrary::init_tracks(const std::string& media_dir) {
             }
 
             std::shared_ptr<Track> track = std::make_shared<Track>(track_name, file_path, SourceType::Local);
-            if (track->load()) {
-                track->unload();
+            if (track->init()) {
                 tracks[track_name] = track;
                 any_loaded = true;
                 std::cout << "[TrackLibrary] Audio file initialized: " << track_name << std::endl;
@@ -57,29 +56,23 @@ bool TrackLibrary::init_tracks(const std::string& media_dir) {
     return any_loaded;
 }
 
-bool TrackLibrary::add_track(const std::string& name, const std::string& source, SourceType source_type) {
+std::string TrackLibrary::add_track(const std::string& name, const std::string& source, SourceType source_type) {
     std::lock_guard<std::mutex> lock(tracks_mutex);
 
     if (tracks.find(name) != tracks.end()) {
         std::cerr << "[TrackLibrary] Track with name '" << name << "' already exists." << std::endl;
-        return false;
+        return "exists";
     }
 
     std::shared_ptr<Track> new_track = std::make_shared<Track>(name, source, source_type);
-    tracks[name] = new_track;
-    std::cout << "[TrackLibrary] Added track: " << name << " with source_type: " << ((source_type==SourceType::Youtube)?"Youtube":"Local") << std::endl;
-    return true;
-    /*std::shared_ptr<Track> track = std::make_shared<Track>(name, file_path);
-    if (track->load()) {
-        track->unload();
-        tracks[name] = track;
-        std::cout << "[TrackLibrary] Added track: " << name << std::endl;
-        return true;
+    if (!new_track->init()) {
+        std::cerr << "[TrackLibrary] Track failed to initialize." << std::endl;
+        return "";
     }
-    else {
-        std::cerr << "[TrackLibrary] Failed to load track: " << name << std::endl;
-        return false;
-    }*/
+    auto new_name = new_track->get_name();
+    tracks[new_name] = new_track;
+    std::cout << "[TrackLibrary] Added track: " << new_name << " with source_type: " << ((source_type==SourceType::Youtube)?"Youtube":"Local") << std::endl;
+    return new_name;
 }
 
 bool TrackLibrary::remove_track(const std::string& name) {
@@ -105,7 +98,6 @@ std::vector<std::string> TrackLibrary::get_all_track_names() const {
     }
     return track_names;
 }
-
 
 std::shared_ptr<Track> TrackLibrary::get_track(const std::string& name) const {
     std::lock_guard<std::mutex> lock(tracks_mutex);
