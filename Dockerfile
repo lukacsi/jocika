@@ -33,6 +33,7 @@ WORKDIR /app
 COPY CMakeLists.txt /app/
 COPY src/ /app/src/
 COPY cmake/ /app/cmake/
+COPY include /app/include/
 
 # Build the project
 RUN mkdir build && cd build \
@@ -56,7 +57,13 @@ RUN apt-get update && apt-get install -y \
     libstdc++6 \
     wget \
     ca-certificates \
+    ffmpeg \
+    python3 \
+    python3-pip \
     && rm -rf /var/lib/apt/lists/*
+
+RUN wget -O /usr/local/bin/yt-dlp https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
+    && chmod a+rx /usr/local/bin/yt-dlp
 
 # Download and install D++ via .deb package in runtime
 RUN wget -O dpp.deb https://dl.dpp.dev/ \
@@ -65,8 +72,6 @@ RUN wget -O dpp.deb https://dl.dpp.dev/ \
     && apt-get install -f -y \
     && rm -rf /var/lib/apt/lists/*
 
-# Add a non-root user for better security
-RUN useradd -m jocika
 
 # Set the working directory
 WORKDIR /app
@@ -74,12 +79,13 @@ WORKDIR /app
 # Copy the built executable from the builder stage
 COPY --from=builder /app/build/jocika ./jocika
 COPY ./media ./media
+COPY ./cookies.txt ./cookies.txt
 
 # Ensure the executable has the correct permissions
-RUN chmod +x ./jocika
+RUN chmod +x ./jocika && chmod 666 ./cookies.txt
 
 # Switch to the non-root user
-USER jocika
+#USER jocika
 
 # Define the default command to run your executable
 ENTRYPOINT ["./jocika"]

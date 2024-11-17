@@ -46,15 +46,15 @@ void PlayCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& 
     }
 
     if (cmd_data.options.empty()) {
+        //seg fault
         guild_audio_manager->queue_all(guild_id);
         event.reply("Queued all tracks in library");
     }
     
 
-    std::cout << (top?"true":"false") << std::endl;
+    //std::cout << (top?"true":"false") << std::endl;
     if (url) {
         event.thinking(true, [event, this, guild_id, source, top](const dpp::confirmation_callback_t& callback) {
-                    event.edit_original_response(dpp::message("thonk"));
             auto name = track_library->add_track("", source, SourceType::Youtube);
             if (name == "") {
                 event.edit_original_response(dpp::message("Failed to initialize track."));
