@@ -1,3 +1,3 @@
-/home/buzi/lprog-hf-2024o-gyoma/cmake/CMakeFiles/jocika.dir
-/home/buzi/lprog-hf-2024o-gyoma/cmake/CMakeFiles/edit_cache.dir
-/home/buzi/lprog-hf-2024o-gyoma/cmake/CMakeFiles/rebuild_cache.dir
+/home/oger/Code/linuxprog/nagyhf/cmake/CMakeFiles/jocika.dir
+/home/oger/Code/linuxprog/nagyhf/cmake/CMakeFiles/edit_cache.dir
+/home/oger/Code/linuxprog/nagyhf/cmake/CMakeFiles/rebuild_cache.dir

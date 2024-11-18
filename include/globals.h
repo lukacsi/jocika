@@ -76,8 +76,8 @@ public:
     }
 
 private:
-    Globals();
-    ~Globals();
+    Globals() {}
+    ~Globals() {}
 
     mutable std::mutex globals_mutex;
 
