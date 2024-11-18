@@ -1,3 +1,0 @@
-/home/oger/Code/linuxprog/nagyhf/cmake/CMakeFiles/jocika.dir
-/home/oger/Code/linuxprog/nagyhf/cmake/CMakeFiles/edit_cache.dir
-/home/oger/Code/linuxprog/nagyhf/cmake/CMakeFiles/rebuild_cache.dir
