@@ -17,10 +17,8 @@ Track::Track(const std::string& _name, const std::string& _source, SourceType _s
 }
 
 std::string select_best_audio_format(const std::vector<std::string>& formats) {
-    // Define preferred format codes in order of priority
     std::vector<std::string> preferred_formats = {"251", "250", "249", "140"};
 
-    // Iterate through preferred formats and check availability
     for (const auto& fmt_code : preferred_formats) {
         for (const auto& fmt : formats) {
             if (fmt == fmt_code) {
@@ -44,7 +42,6 @@ std::string trim(const std::string& s) {
     return std::string(start, end + 1);
 }
 
-// Function to split a string into tokens based on whitespace
 std::vector<std::string> split(const std::string& s) {
     std::vector<std::string> tokens;
     std::istringstream iss(s);
@@ -125,14 +122,13 @@ bool Track::init() {
 
         std::array<char, 128> buffer;
         std::string data;
-        std::string command = "yt-dlp --cookies \"" + cookies_path + "\" --get-title --get-duration -F '" + source + "'";
+        std::string command = "yt-dlp --cookies '" + cookies_path + "' --get-title --get-duration -F '" + source + "'";
         shared_ptr<FILE> pipe(popen(command.c_str(), "r"), pclose);
         if (!pipe) {
             std::cerr << "[Track] popen() failed!" << std::endl;
             return false;
         }
 
-        // Read till end of process
         while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
             data+= buffer.data();
         }
@@ -179,11 +175,11 @@ bool Track::init() {
         }
         if (time_parts.size() == 1) {
             length = time_parts[0];
-        } else if (time_parts.size() == 2) { // M:SS
+        } else if (time_parts.size() == 2) {
             length = time_parts[0] * 60 + time_parts[1];
-        } else if (time_parts.size() == 3) { // H:MM:SS
+        } else if (time_parts.size() == 3) {
             length = time_parts[0] * 3600 + time_parts[1] * 60 + time_parts[2];
-        } else { // Unexpected format
+        } else {
             std::cerr << "Unexpected duration format: " << time_data << std::endl;
             return false;
         }
