@@ -1,6 +1,7 @@
 #ifndef GUILD_AUDIO_MANAGER_H
 #define GUILD_AUDIO_MANAGER_H
 
+#include "utils/track.h"
 #include "utils/track_library.h"
 #include <condition_variable>
 #include <dpp/discordclient.h>
@@ -8,18 +9,22 @@
 #include <map>
 #include <memory>
 #include <mutex>
-#include <queue>
 #include <thread>
+#include <vector>
 
 class Audio;
 
 struct GuildQueue {
-    std::queue<std::string> tracks;
+    std::deque<std::shared_ptr<Track>> tracks;
+    std::shared_ptr<Track> current_track;
+    size_t elapsed;
     bool is_playing;
+    bool stop;
+    bool skip;
+    bool paused;
     std::mutex queue_mutex;
-    dpp::voiceconn* voice_connection;
 
-    GuildQueue() : is_playing(false), voice_connection(nullptr) {}
+    GuildQueue() : is_playing(false), stop(false), skip(false), paused(false), current_track(nullptr), elapsed(0) {}
 };
 
 class GuildAudioManager {
@@ -30,14 +35,25 @@ public:
     GuildAudioManager(const GuildAudioManager&) = delete;
     GuildAudioManager& operator=(const GuildAudioManager&) = delete;
 
-    void queue_track(dpp::snowflake guild_id, const std::string& track_name);
+    std::vector<std::shared_ptr<Track>> queue_track(dpp::snowflake guild_id, const std::string& track_name);
+    std::vector<std::shared_ptr<Track>> queue_track_top(dpp::snowflake, const std::string& track_name);
     void queue_all(dpp::snowflake guild_id);
-    void skip_track(dpp::snowflake guild_id);
 
-    void set_voice_connection(dpp::snowflake guild_id, dpp::voiceconn* vc);
+    bool move_track(dpp::snowflake guild_id, size_t from_pos, size_t to_pos);
+
+    void skip_track(dpp::snowflake guild_id);
+    void pause_track(dpp::snowflake guild_id);
+    void resume_track(dpp::snowflake guild_id);
+
+    //void remove_queue(dpp::snowflake guild_id);
+    void clear_queue(dpp::snowflake guild_id);
+
+    std::vector<std::string> get_queued_tracks(dpp::snowflake guild_id);
+
+    
 
 private:
-    std::map<dpp::snowflake, std::unique_ptr<GuildQueue>> guild_queues;
+    std::map<dpp::snowflake, std::shared_ptr<GuildQueue>> guild_queues;
     std::mutex manager_mutex;
 
     std::shared_ptr<Audio> audio;
@@ -51,7 +67,7 @@ private:
 
     void playback_loop();
 
-    GuildQueue* get_queue(dpp::snowflake guild_id);
+    std::shared_ptr<GuildQueue> get_queue(dpp::snowflake guild_id);
 };
 
 #endif

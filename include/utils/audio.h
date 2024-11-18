@@ -1,44 +1,45 @@
 #ifndef AUDIO_H
 #define AUDIO_H
 
+#include "track.h"
 #include <dpp/discordclient.h>
 #include <dpp/snowflake.h>
 #include <map>
 #include <memory>
 #include <mutex>
-#include <string>
-#include <vector>
-
-class GuildAudioManager;
-class TrackLibrary;
 
 class Audio {
 public:
-    Audio(std::shared_ptr<TrackLibrary> _track_library);
+    Audio();
 
     Audio(const Audio&) = delete;
     Audio& operator=(const Audio&) = delete;
+    
+    //void recover_voice_connections(std::vector<dpp::snowflake> guild_ids);
 
-    std::vector<std::string> get_all_track_names() const;
+    bool voice_ready(dpp::snowflake guild_id);
+    void send_audio_to_voice(dpp::snowflake guild_id, std::shared_ptr<Track> track,
+                             std::function<bool()> stop_callback,
+                             std::function<bool()> pause_callback);
+    void send_stream_audio(dpp::voiceconn* vc, std::shared_ptr<Track> track,
+                           std::function<bool()> stop_callback,
+                           std::function<bool()> pause_callback);
+    void send_local_audio(dpp::voiceconn* vc, std::shared_ptr<Track> track);
 
-    void play_track(dpp::snowflake guild_id, const std::string& track_name, dpp::voiceconn* vc);
+    void stop_audio(dpp::snowflake guild_id);
+    void pause_audio(dpp::snowflake guild_id);
+    void resume_audio(dpp::snowflake guild_id);
 
-    void send_audio_to_voice(dpp::voiceconn* vc, const std::string& track_name);
+    void set_voice_connection(dpp::snowflake guild_id, dpp::voiceconn* vc);
+    dpp::voiceconn* get_voice_connection(dpp::snowflake guild_id);
+    void remove_voice_connection(dpp::snowflake guild_id);
 
-    void set_guild_audio_manager(std::shared_ptr<GuildAudioManager> manager);
-
-    bool add_track(const std::string& name, const std::string& file_path);
-
-    bool remove_track(const std::string& name);
+    void join_voice(dpp::guild* guild, dpp::snowflake user_id);
+    void disconnect_voice(dpp::snowflake guild_id);
 
 private:
-    std::shared_ptr<TrackLibrary> track_library;
-    std::shared_ptr<GuildAudioManager> guild_audio_manager;
-
-    std::map<std::string, std::vector<uint8_t>> tracks;
-    mutable std::mutex tracks_mutex;
-    bool decode_mp3(const std::string& file_path, std::vector<uint8_t>& pcm_data);
+    std::map<dpp::snowflake, dpp::voiceconn*> voice_connections;
+    std::mutex voice_mutex;
 };
-
 
 #endif
