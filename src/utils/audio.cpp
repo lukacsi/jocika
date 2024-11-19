@@ -60,6 +60,10 @@ void Audio::send_audio_to_voice(dpp::snowflake guild_id, std::shared_ptr<Track> 
     }
 } 
 
+
+/// TODO
+/// RETURN WITH STOP_CALLBACK
+/// REMOVE PAUSE CALLBACK
 void Audio::send_stream_audio(dpp::voiceconn* vc, std::shared_ptr<Track> track,
                                   std::function<bool()> stop_callback, std::function<bool()> pause_callback) {
     auto best_format = track->get_best_format();

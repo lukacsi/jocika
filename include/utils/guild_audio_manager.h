@@ -40,6 +40,7 @@ public:
     void queue_all(dpp::snowflake guild_id);
 
     bool move_track(dpp::snowflake guild_id, size_t from_pos, size_t to_pos);
+    bool remove_track(dpp::snowflake guild_id, size_t position);
 
     void skip_track(dpp::snowflake guild_id);
     void pause_track(dpp::snowflake guild_id);

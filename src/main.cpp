@@ -22,7 +22,6 @@
 #include <string>
 #include <commands/slog_command.h>
 #include <listeners/slog_listener.h>
-#include <vector>
 
 int main(int argc, char* argv[]) {
     bool register_commands = false;
@@ -42,14 +41,14 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
     const std::string token = token_env;
-    dpp::cluster bot(token);
+    dpp::cluster bot(token, dpp::i_default_intents | dpp::i_message_content);
 
     bot.on_log(dpp::utility::cout_logger());
     
 
     auto track_library = std::make_shared<TrackLibrary>();
     if (!track_library->init_tracks(media_dir)) {
-        std::cerr << "Failed to load media, or media_dir empty" << std::endl;
+        std::cout << "Failed to load media, or media_dir empty" << std::endl;
     }
 
     auto audio_processor = std::make_shared<Audio>();

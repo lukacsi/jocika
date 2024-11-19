@@ -38,7 +38,7 @@ bool TrackLibrary::init_tracks(const std::string& media_dir) {
             if (track->init()) {
                 tracks[track_name] = track;
                 any_loaded = true;
-                std::cout << "[TrackLibrary] Audio file initialized: " << track_name << std::endl;
+                //std::cout << "[TrackLibrary] Audio file initialized: " << track_name << std::endl;
             }
             else {
                 std::cerr << "[TrackLibrary] Failed to initialize track: " << track_name << std::endl;
@@ -47,7 +47,7 @@ bool TrackLibrary::init_tracks(const std::string& media_dir) {
     }
 
     if (!any_loaded) {
-        std::cerr << "[TrackLibrary] No tracks initialized from directory: " << media_dir << std::endl;
+        std::cout << "[TrackLibrary] No tracks initialized from directory: " << media_dir << std::endl;
     }
     else {
         std::cout << "[TrackLibrary] Successfully initialized tracks from directory: " << media_dir << std::endl;
@@ -59,17 +59,17 @@ bool TrackLibrary::init_tracks(const std::string& media_dir) {
 std::string TrackLibrary::add_track(const std::string& name, const std::string& source, SourceType source_type) {
     std::lock_guard<std::mutex> lock(tracks_mutex);
 
-    if (tracks.find(name) != tracks.end()) {
-        std::cerr << "[TrackLibrary] Track with name '" << name << "' already exists." << std::endl;
-        return "exists";
-    }
-
     std::shared_ptr<Track> new_track = std::make_shared<Track>(name, source, source_type);
     if (!new_track->init()) {
         std::cerr << "[TrackLibrary] Track failed to initialize." << std::endl;
         return "";
     }
+
     auto new_name = new_track->get_name();
+    if (tracks.find(new_name) != tracks.end()) {
+        std::cerr << "[TrackLibrary] Track with name '" << name << "' already exists." << std::endl;
+        return new_name;
+    }
     tracks[new_name] = new_track;
     std::cout << "[TrackLibrary] Added track: " << new_name << " with source_type: " << ((source_type==SourceType::Youtube)?"Youtube":"Local") << std::endl;
     return new_name;

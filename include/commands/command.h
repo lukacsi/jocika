@@ -12,16 +12,12 @@ public:
     virtual ~Command() = default;
     virtual void execute(const dpp::slashcommand_t& event, const dpp::cluster&bot) = 0;
 
-    void register_command(dpp::cluster& bot) {
+    dpp::slashcommand get_command(dpp::cluster& bot) {
         dpp::slashcommand command(name, description, bot.me.id);
         for (auto option : options) {
             command.add_option(option);
         }
-        bot.global_command_create(command, [this](const dpp::confirmation_callback_t& callback) {
-            if (callback.is_error()) {
-                std::cerr << "Failed to register command " + name + " command: " << callback.get_error().message << std::endl;
-            }
-        });
+        return command;
     }
 
     std::string get_name() const { return name; }
