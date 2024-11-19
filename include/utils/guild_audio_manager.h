@@ -1,6 +1,7 @@
 #ifndef GUILD_AUDIO_MANAGER_H
 #define GUILD_AUDIO_MANAGER_H
 
+#include "utils/audio.h"
 #include "utils/track.h"
 #include "utils/track_library.h"
 #include <condition_variable>
@@ -9,22 +10,23 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <random>
 #include <thread>
 #include <vector>
 
-class Audio;
-
 struct GuildQueue {
     std::deque<std::shared_ptr<Track>> tracks;
+    std::deque<std::shared_ptr<Track>> tracks_played;
     std::shared_ptr<Track> current_track;
     size_t elapsed;
     bool is_playing;
     bool stop;
     bool skip;
     bool paused;
+    bool loop_all, loop_one;
     std::mutex queue_mutex;
 
-    GuildQueue() : is_playing(false), stop(false), skip(false), paused(false), current_track(nullptr), elapsed(0) {}
+    GuildQueue() : is_playing(false), stop(false), skip(false), paused(false), loop_all(false), loop_one(false), current_track(nullptr), elapsed(0) {}
 };
 
 class GuildAudioManager {
@@ -38,6 +40,10 @@ public:
     std::vector<std::shared_ptr<Track>> queue_track(dpp::snowflake guild_id, const std::string& track_name);
     std::vector<std::shared_ptr<Track>> queue_track_top(dpp::snowflake, const std::string& track_name);
     void queue_all(dpp::snowflake guild_id);
+    
+    bool shuffle(dpp::snowflake guild_id);
+    bool loop_one(dpp::snowflake guild_id, bool loop_one);
+    bool loop_all(dpp::snowflake guild_id, bool loop_all);
 
     bool move_track(dpp::snowflake guild_id, size_t from_pos, size_t to_pos);
     bool remove_track(dpp::snowflake guild_id, size_t position);
@@ -63,6 +69,8 @@ private:
     std::condition_variable cv;
     std::mutex cv_mutex;
     bool stop_thread;
+
+    std::mt19937 g;
 
     std::thread playback_thread;
 
