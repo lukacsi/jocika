@@ -1,4 +1,5 @@
 #include "commands/queue_command.h"
+#include <string>
 
 void QueueCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& bot) {
     auto cmd_data = event.command.get_command_interaction();
@@ -53,7 +54,29 @@ void QueueCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster&
                         + " from queue");
         }
         event.reply("Removed track from queue in position " + std::to_string(position));
-    } else {
+    } else if (subcommand.name == "shuffle") {
+        if (!guild_audio_manager->shuffle(guild_id)) {
+            event.reply("Queue is currently empty");
+            return;
+        }
+        event.reply("Shuffled queue");
+
+    } else if (subcommand.name == "loop_track") {
+        bool loop_one = subcommand.get_value<bool>(0);
+        if (!guild_audio_manager->loop_one(guild_id, loop_one)) {
+            event.reply("Queue is currently empty");
+            return;
+        }
+        event.reply("Queue looping set to: " + std::to_string(loop_one));
+    } else if (subcommand.name == "loop_queue") {
+        bool loop_all = subcommand.get_value<bool>(0);
+        if (!guild_audio_manager->loop_all(guild_id, loop_all)) {
+            event.reply("Queue is currently empty");
+            return;
+        }
+        event.reply("Queue looping set to: " + std::to_string(loop_all));
+    }
+    else {
         event.reply("Unrecognised subcommand");
     }
 }
