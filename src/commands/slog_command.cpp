@@ -12,12 +12,13 @@ void SLogCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& 
 
 */
 
-
+/*
     if(gmembr == nullptr) {
         event.reply(dpp::message("User does not exist on this server.").set_flags(dpp::m_ephemeral));
     } else {
         Globals::get_instance().log_user(tgt,event.command.guild_id);
         event.reply(dpp::message("Logging target user.").set_flags(dpp::m_ephemeral));
     }
+*/
 }
 

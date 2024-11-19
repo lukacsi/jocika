@@ -127,7 +127,6 @@ bool GuildAudioManager::move_track(dpp::snowflake guild_id, size_t from_pos, siz
         return true;
     }
 
-    // Using std::deque, we can use iterators to move elements
     auto from_it = guild_queue->tracks.begin() + from_pos;
     auto track = *from_it;
     guild_queue->tracks.erase(from_it);
@@ -137,6 +136,28 @@ bool GuildAudioManager::move_track(dpp::snowflake guild_id, size_t from_pos, siz
               << " to position " << to_pos << " in guild " << guild_id << std::endl;
 
     cv.notify_all();
+    return true;
+}
+
+bool GuildAudioManager::remove_track(dpp::snowflake guild_id, size_t position) {
+    auto guild_queue = get_queue(guild_id);
+    if (!guild_queue) {
+        std::cerr << "[GuildAudioManager] No queue found for guild " << guild_id << std::endl;
+        return false;
+    }
+    
+    std::lock_guard<std::mutex> lock(guild_queue->queue_mutex);
+    size_t queue_size = guild_queue->tracks.size();
+
+    if (position >= queue_size) {
+        std::cerr << "[GuildAudioManager] Invalid positions. Queue size: " << queue_size 
+                  << ", position: " << position << std::endl;
+        return false;
+    }
+    auto it = guild_queue->tracks.begin() + position;
+    guild_queue->tracks.erase(it);
+    std::cout << "[GuildAudioManager] Removed track at position " << position 
+        << " from queue in guild " << guild_id << std::endl;
     return true;
 }
 
@@ -254,7 +275,8 @@ void GuildAudioManager::playback_loop() {
                         guild_queue->is_playing = true;
                         guild_queue->skip = false;
                         guild_queue->elapsed = 0;
-                        std::cout << "[GuildAudioManager] playing track '" << guild_queue->current_track->get_name() << "' for guild " << guild_id << std::endl;
+                        std::cout << "[GuildAudioManager] playing track '" << guild_queue->current_track->get_name()
+                            << "' for guild " << guild_id << std::endl;
                         std::thread([this, guild_queue, track, guild_id]() {
                             auto stop_callback = [guild_queue]() {
                                 std::lock_guard<std::mutex> lock(guild_queue->queue_mutex);
@@ -268,6 +290,8 @@ void GuildAudioManager::playback_loop() {
 
                             audio->send_audio_to_voice(guild_id, track, stop_callback, pause_callback);
                             
+                            /// TODO WAIT FOR AUDIO TO TRULY PLAY BEFORE STARTING COUNTDOWN
+
                             size_t length_s = track->get_length();
                             size_t elapsed_s = 0;
                             while (elapsed_s < length_s) {
@@ -275,7 +299,9 @@ void GuildAudioManager::playback_loop() {
                                 {
                                     std::unique_lock<std::mutex> lock(guild_queue->queue_mutex);
                                     if (guild_queue->paused) {
-                                        cv.wait(lock, [&guild_queue]() { return !guild_queue->paused || guild_queue->stop || guild_queue->skip; });
+                                        cv.wait(lock, [&guild_queue]() {
+                                            return !guild_queue->paused || guild_queue->stop || guild_queue->skip;
+                                        });
                                     }
                                     if (guild_queue->skip || guild_queue->stop) {
                                         std::cout << "[GuildAudioManager] Track skipped or stop requested: " << track->get_name() << std::endl;
