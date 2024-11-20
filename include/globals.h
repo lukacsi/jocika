@@ -11,7 +11,7 @@
 #include <dpp/dpp.h>
 
 #include <string>
-const std::string cookies_path = "./cookies.txt";
+const std::string cookies_path = "/home/oger/Code/linuxprog/nagyhf/cookies.txt";
 
 
 struct LocalUser {
