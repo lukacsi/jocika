@@ -119,17 +119,22 @@ void PlayCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& 
     else if (subcommand_name == "from_youtube") {
         event.thinking(true, [event, this, guild_id, source, top](const dpp::confirmation_callback_t& callback) {
             event.edit_original_response(dpp::message("Downloading track data"));
-            auto name = track_library->add_track("", source, SourceType::Youtube);
-            if (name == "") {
+            auto names = track_library->add_url_tracks(source);
+            if (name.empty()) {
                 event.edit_original_response(dpp::message("Failed to initialize track."));
                 return;
             }
-            if (top) {
-                guild_audio_manager->queue_track_top(guild_id, name);
-            } else {
-                guild_audio_manager->queue_track(guild_id, name);
+
+            std::string reply;
+            for (const auto& name : names) {
+                if (top) {
+                    guild_audio_manager->queue_track_top(guild_id, name);
+                } else {
+                    guild_audio_manager->queue_track(guild_id, name);
+                }
+                reply += name + '\n';
             }
-            event.edit_original_response(dpp::message("Queued track: " + name));
+            event.edit_original_response(dpp::message("Queued track(s):\n" + reply));
         });
 
     }
