@@ -15,6 +15,7 @@ enum class SourceType {
 class Track {
 public:
     Track(const std::string& _name, const std::string& _source, SourceType _source_type);
+    Track(const std::string& _name, const std::string& _soruce, SourceType _source_type, const std::string& _best_format, const size_t& lenght);
 
     bool init();
     bool load();

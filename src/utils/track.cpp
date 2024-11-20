@@ -1,22 +1,18 @@
 #include "utils/track.h"
-#include "globals.h"
-#include <memory>
-#include <array>
 #include <mpg123.h>
 #include <iostream>
-#include <regex>
-#include <sstream>
 #include <string>
 #include <vector>
 
-using std::shared_ptr;
 
 Track::Track(const std::string& _name, const std::string& _source, SourceType _source_type)
-    : name(_name), source(_source), length(0), rate(0), channels(0),  encoding(0) {
-    source_type = _source_type;
-}
+    : name(_name), source(_source), length(0), rate(0), channels(0),  encoding(0), source_type(_source_type) {}
 
-std::string select_best_audio_format(const std::vector<std::string>& formats) {
+
+Track::Track(const std::string& _name, const std::string& _soruce, SourceType _source_type, const std::string& _best_format, const size_t& _lenght)
+    : name(_name), source(_soruce), source_type(_source_type), best_format(_best_format), length(_lenght) {}
+
+/*std::string select_best_audio_format(const std::vector<std::string>& formats) {
     std::vector<std::string> preferred_formats = {"251", "250", "249", "140"};
 
     for (const auto& fmt_code : preferred_formats) {
@@ -50,7 +46,7 @@ std::vector<std::string> split(const std::string& s) {
         tokens.push_back(token);
     }
     return tokens;
-}
+}*/
 
 bool Track::init() {
     if (source_type == SourceType::Local) {
@@ -118,7 +114,7 @@ bool Track::init() {
         std::cout << "[Track] Track data initialized: " << name << std::endl;
         pcm_data.clear();
         return true;
-    } else if (source_type == SourceType::Youtube) {
+    }/* else if (source_type == SourceType::Youtube) {
 
         std::array<char, 128> buffer;
         std::string data;
@@ -188,7 +184,7 @@ bool Track::init() {
 
         std::cout << "[Track] Initialized YouTube track '" << name << "' duration " << length << " best format " << best_format << std::endl;
         return true;
-    }
+    }*/
     return false;
 
 }

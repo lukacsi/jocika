@@ -17,7 +17,8 @@ public:
     ~TrackLibrary();
 
     bool init_tracks(const std::string& media_dir);
-    std::string add_track(const std::string& name, const std::string& source, SourceType source_type);
+    /*std::string add_track(const std::string& name, const std::string& source, SourceType source_type);*/
+    std::vector<std::string> add_url_tracks(const std::string& url);
     bool remove_track(const std::string& name);
 
     std::shared_ptr<Track> get_track(const std::string& name) const;
