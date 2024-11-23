@@ -37,8 +37,8 @@ public:
     GuildAudioManager(const GuildAudioManager&) = delete;
     GuildAudioManager& operator=(const GuildAudioManager&) = delete;
 
-    std::vector<std::shared_ptr<Track>> queue_track(dpp::snowflake guild_id, const std::string& track_name);
-    std::vector<std::shared_ptr<Track>> queue_track_top(dpp::snowflake, const std::string& track_name);
+    std::vector<std::shared_ptr<Track>> queue_track(dpp::snowflake guild_id, const std::string& track_name, const bool top = false);
+    /*std::vector<std::shared_ptr<Track>> queue_track_top(dpp::snowflake, const std::string& track_name);*/
     void queue_all(dpp::snowflake guild_id);
     
     bool shuffle(dpp::snowflake guild_id);

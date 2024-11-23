@@ -4,6 +4,7 @@
 #include "track.h"
 #include <dpp/discordclient.h>
 #include <dpp/snowflake.h>
+#include <future>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -19,11 +20,9 @@ public:
 
     bool voice_ready(dpp::snowflake guild_id);
     void send_audio_to_voice(dpp::snowflake guild_id, std::shared_ptr<Track> track,
-                             std::function<bool()> stop_callback,
-                             std::function<bool()> pause_callback);
+                             std::function<bool()> stop_callback, std::promise<void>& ready_promise);
     void send_stream_audio(dpp::voiceconn* vc, std::shared_ptr<Track> track,
-                           std::function<bool()> stop_callback,
-                           std::function<bool()> pause_callback);
+                           std::function<bool()> stop_callback, std::promise<void>& ready_promise);
     void send_local_audio(dpp::voiceconn* vc, std::shared_ptr<Track> track);
 
     void stop_audio(dpp::snowflake guild_id);

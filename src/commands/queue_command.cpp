@@ -1,4 +1,5 @@
 #include "commands/queue_command.h"
+#include "globals.h"
 #include <string>
 
 void QueueCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& bot) {
@@ -20,10 +21,17 @@ void QueueCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster&
         }
 
         std::string reply_message = "Current Track: " + tracks[0] + '\n';
+        int i = max_tracks_reply;
         if (tracks.size() > 1) {
             reply_message += "Tracks queued:\n";
             for (size_t i = 1; i < tracks.size(); ++i) {
-                reply_message += std::to_string(i) + ". " + tracks[i] + "\n";
+                if (i > 0) {
+                    i--;
+                    reply_message += std::to_string(i) + ". " + tracks[i] + "\n";
+                }
+            }
+            if (i == 0) {
+                event.reply(std::to_string(tracks.size() - max_tracks_reply) + " more tracks \n");
             }
         }
         

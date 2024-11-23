@@ -1,6 +1,5 @@
 #include "utils/audio.h"
 #include "globals.h"
-#include "utils/guild_audio_manager.h"
 #include "utils/track_library.h"
 #include <cstdio>
 #include <dpp/discordclient.h>
@@ -40,7 +39,7 @@ bool Audio::voice_ready(dpp::snowflake guild_id) {
 }
 
 void Audio::send_audio_to_voice(dpp::snowflake guild_id, std::shared_ptr<Track> track,
-                                std::function<bool()> stop_callback, std::function<bool()> pause_callback) {
+                                std::function<bool()> stop_callback, std::promise<void>& ready_promise) {
     if (!track) {
         std::cerr << "[Audio] Null track provided to send_audio_to_voice." << std::endl;
         return;
@@ -52,37 +51,35 @@ void Audio::send_audio_to_voice(dpp::snowflake guild_id, std::shared_ptr<Track> 
         return;
     }
     if (track->get_source_type() == SourceType::Youtube) {
-        std::thread([this, vc, track, stop_callback, pause_callback]() {
-            send_stream_audio(vc, track, stop_callback, pause_callback);
+        std::thread([this, vc, track, stop_callback, &ready_promise]() {
+            send_stream_audio(vc, track, stop_callback, ready_promise);
         }).detach();
     } else {
         send_local_audio(vc, track);
+        ready_promise.set_value();
     }
 } 
 
-
-/// TODO
-/// RETURN WITH STOP_CALLBACK
-/// REMOVE PAUSE CALLBACK
 void Audio::send_stream_audio(dpp::voiceconn* vc, std::shared_ptr<Track> track,
-                                  std::function<bool()> stop_callback, std::function<bool()> pause_callback) {
+                                  std::function<bool()> stop_callback, std::promise<void>& ready_promise) {
     auto best_format = track->get_best_format();
     auto source = track->get_source();
 
     std::string ffmpeg_input_format;
 
-    // Example: format_code 251,250,249 are usually webm/opus
     if (best_format == "251" || best_format == "250" || best_format == "249") {
         ffmpeg_input_format = "webm";
     }
-    // format_code 140 is m4a
+
     else if (best_format == "140") {
         ffmpeg_input_format = "m4a";
     } else {
         return;
     }
 
-    std::string command = "yt-dlp --cookies \"" + cookies_path + "\" --quiet --no-warnings --no-progress -f " + best_format + " -o - '" + source + "' | ffmpeg -hide_banner -loglevel quiet -f " + ffmpeg_input_format + " -i - -f s16le -ar 48000 -ac 2 -";
+    std::string command = "yt-dlp --cookies \"" + cookies_path + "\" --quiet --no-warnings --no-progress -f "
+        + best_format + " -o - \"https://www.youtube.com/watch?v=" + source + "\" | ffmpeg -hide_banner -loglevel quiet -f "
+        + ffmpeg_input_format + " -i - -f s16le -ar 48000 -ac 2 -";
    
     FILE *read_stream = popen(command.c_str(), "r");
 
@@ -96,13 +93,21 @@ void Audio::send_stream_audio(dpp::voiceconn* vc, std::shared_ptr<Track> track,
     char buf[bufsize];
     ssize_t buf_read = 0;
     ssize_t current_read = 0;
-
+    bool ready_set = false;
     while ((current_read = fread(buf + buf_read, 1, bufsize - buf_read, read_stream)) > 0) {
+        if (stop_callback()) {
+            pclose(read_stream);
+            read_stream = NULL;
+            return;
+        }
         buf_read += current_read;
 
-        // queue buffer only when it's exactly `bufsize` size
         if (buf_read == bufsize) {
             vc->voiceclient->send_audio_raw((uint16_t *)buf, buf_read);
+            if (!ready_set) {
+                ready_promise.set_value();
+                ready_set = true;
+            }
             buf_read = 0;
         }
     }
