@@ -69,6 +69,7 @@ void PlayCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& 
         }
     }
 
+    int i = max_tracks_reply;
     auto subcommand_name = subcommand.name;
     if (subcommand_name == "all") {
         guild_audio_manager->queue_all(guild_id);
@@ -76,16 +77,18 @@ void PlayCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& 
     }
     else if (subcommand_name == "from_library") {
         std::vector<std::shared_ptr<Track>> tracks; 
-        if (top) {
-             tracks = guild_audio_manager->queue_track_top(guild_id, source);           
-        } else {
-            tracks = guild_audio_manager->queue_track(guild_id, source);
+        tracks = guild_audio_manager->queue_track(guild_id, source, top);
 
-        }
-        std::string reply = "Multiple tracks found:\n";
         if(tracks.size() > 1) {
+            std::string reply = "Multiple tracks found:\n";
             for (const auto& track : tracks) {
-                reply += track->get_name() + '\n';
+                if (i > 0) {
+                    i--;
+                    reply += track->get_name() + '\n';
+                }
+            }
+            if (i == 0) {
+                reply += "...\n";
             }
             event.reply(reply);
             return;
@@ -98,26 +101,27 @@ void PlayCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& 
 
     }
     else if (subcommand_name == "like") {
-        auto tracks = guild_audio_manager->queue_track(guild_id, source);
+        auto tracks= guild_audio_manager->queue_track(guild_id, source);
         if (tracks.size() > 0) {
-            std::string reply = "Queued track(s):";
+            std::string reply = "Queued " + std::to_string(tracks.size()) +  " track(s):\n"; 
             for (const auto& track : tracks) {
                 auto name = track->get_name();
-                if (top) {
-                    guild_audio_manager->queue_track_top(guild_id, name);
-                } else {
-                    guild_audio_manager->queue_track(guild_id, name);
+                guild_audio_manager->queue_track(guild_id, name, top);
+                if (i > 0) {
+                    i--;
+                    reply += name + '\n';
                 }
-                reply += name + '\n';
+            }
+            if (i == 0) {
+                reply += "...\n";
             }
             event.reply(reply);
         } else {
             event.reply("No matching tracks were found!");
         }
-
     }
     else if (subcommand_name == "from_youtube") {
-        event.thinking(true, [event, this, guild_id, source, top](const dpp::confirmation_callback_t& callback) {
+        event.thinking(true, [event, this, guild_id, source, top, &i](const dpp::confirmation_callback_t& callback) {
             event.edit_original_response(dpp::message("Downloading track data"));
             auto names = track_library->add_url_tracks(source);
             if (name.empty()) {
@@ -125,16 +129,19 @@ void PlayCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& 
                 return;
             }
 
-            std::string reply;
+            std::string reply = "Queued " + std::to_string(names.size()) +  " track(s):\n"; 
+
             for (const auto& name : names) {
-                if (top) {
-                    guild_audio_manager->queue_track_top(guild_id, name);
-                } else {
-                    guild_audio_manager->queue_track(guild_id, name);
+                guild_audio_manager->queue_track(guild_id, name, top);
+                if (i > 0) {
+                    i--;
+                    reply += name + '\n';
                 }
-                reply += name + '\n';
             }
-            event.edit_original_response(dpp::message("Queued track(s):\n" + reply));
+            if (i == 0) {
+                reply += "...\n";
+            }
+            event.edit_original_response(dpp::message(reply));
         });
 
     }

@@ -105,7 +105,7 @@ std::vector<std::string> TrackLibrary::add_url_tracks(const std::string& url) {
 
     std::array<char, 128> buffer;
     std::string data;
-    std::string command = "yt-dlp --cookies '" + cookies_path + "' --get-title --get-id --get-duration -F '" + url + "'";
+    std::string command = "yt-dlp --cookies \"" + cookies_path + "\" --get-title --get-id --get-duration -F \"" + url + "\"";
     std::shared_ptr<FILE> pipe(popen(command.c_str(), "r"), pclose);
     if (!pipe) {
         std::cerr << "[Track] popen() failed!" << std::endl;

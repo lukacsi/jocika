@@ -3,6 +3,7 @@
 #include "utils/track_library.h"
 #include <chrono>
 #include <dpp/snowflake.h>
+#include <future>
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -31,7 +32,7 @@ GuildAudioManager::~GuildAudioManager() {
     }
 }
 
-std::vector<std::shared_ptr<Track>> GuildAudioManager::queue_track(dpp::snowflake guild_id, const std::string& track_name) {
+std::vector<std::shared_ptr<Track>> GuildAudioManager::queue_track(dpp::snowflake guild_id, const std::string& track_name, const bool top) {
     auto guild_queue = get_queue(guild_id);
     if (!guild_queue) {
         std::cerr << "[GuildAudioManager] Failed to get or create queue for guild " << guild_id << std::endl;
@@ -51,14 +52,18 @@ std::vector<std::shared_ptr<Track>> GuildAudioManager::queue_track(dpp::snowflak
 
     {
         std::lock_guard<std::mutex> lock(guild_queue->queue_mutex);
-        guild_queue->tracks.push_back(tracks.at(0));
+        if (top) {
+            guild_queue->tracks.push_front(tracks.at(0));
+        } else {
+            guild_queue->tracks.push_back(tracks.at(0));
+        }
     }
     cv.notify_all();
     std::cout << "[GuildAudioManager] Queued track: " << tracks[0]->get_name() << " in guild: " << guild_id << std::endl; 
     return tracks;
 }
 
-std::vector<std::shared_ptr<Track>> GuildAudioManager::queue_track_top(dpp::snowflake guild_id, const std::string& track_name) {
+/*std::vector<std::shared_ptr<Track>> GuildAudioManager::queue_track_top(dpp::snowflake guild_id, const std::string& track_name) {
     auto guild_queue = get_queue(guild_id);
     if (!guild_queue) {
         std::cerr << "[GuildAudioManager] Failed to get or create queue for guild " << guild_id << std::endl;
@@ -83,7 +88,7 @@ std::vector<std::shared_ptr<Track>> GuildAudioManager::queue_track_top(dpp::snow
     cv.notify_all();
     std::cout << "[GuildAudioManager] Queued track: " << tracks[0]->get_name() << " in guild: " << guild_id << std::endl; 
     return tracks;
-}
+}*/
 
 void GuildAudioManager::queue_all(dpp::snowflake guild_id) {
     auto guild_queue = get_queue(guild_id);
@@ -368,11 +373,22 @@ void GuildAudioManager::playback_loop() {
                                 std::lock_guard<std::mutex> lock(guild_queue->queue_mutex);
                                 return guild_queue->paused;
                             };
-
-                            audio->send_audio_to_voice(guild_id, track, stop_callback, pause_callback);
                             
-                            /// TODO WAIT FOR AUDIO TO TRULY PLAY BEFORE STARTING COUNTDOWN
 
+                            std::promise<void> ready_promise;
+                            std::future<void> ready_future = ready_promise.get_future();
+
+                            audio->send_audio_to_voice(guild_id, track, stop_callback, ready_promise);
+                            
+                            ready_future.wait();
+                            /*if (ready_future.wait_for(std::chrono::seconds(10)) == std::future_status::ready) {
+                            } else {
+                                std::cerr << "[GuildAudioManager] Timeout waiting for audio to be ready for guild " << guild_id << std::endl;
+                                audio->stop_audio(guild_id);
+                                guild_queue->tracks_played.push_front(track);
+                                track->unload();
+                                return;
+                            } */
                             size_t length_s = track->get_length();
                             size_t elapsed_s = 0;
                             while (elapsed_s < length_s) {

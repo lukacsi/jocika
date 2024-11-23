@@ -12,6 +12,7 @@
 
 #include <string>
 const std::string cookies_path = "./cookies.txt";
+const int max_tracks_reply = 30;
 
 
 struct LocalUser {
