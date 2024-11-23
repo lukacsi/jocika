@@ -140,8 +140,10 @@ std::vector<std::string> TrackLibrary::add_url_tracks(const std::string& url) {
     bool in_formats = false;
 
 
+    // Regular expression to identify format lines (starting with digits or 'sb' followed by digits)
     std::regex format_line_regex(R"(^\s*(?:\d+|sb\d+)\s+)");
 
+    // Parse lines from the end to the beginning
     size_t idx = data_lines.size();
     while (idx > 0) {
         idx--;
@@ -157,6 +159,7 @@ std::vector<std::string> TrackLibrary::add_url_tracks(const std::string& url) {
         }
 
         if (!in_formats) {
+            // Assume that every track ends with duration, video_id, and title in that order
             if (idx + 4 < 0) {
                 std::cerr << "[TrackLibrary] Insufficient lines for track metadata." << std::endl;
                 break;
@@ -173,6 +176,7 @@ std::vector<std::string> TrackLibrary::add_url_tracks(const std::string& url) {
             current_track.video_id = video_id;
             current_track.duration = duration;
 
+            //std::cout << track_title << video_id << duration << std::endl;
             in_formats = true;
             continue;
         }
@@ -190,12 +194,14 @@ std::vector<std::string> TrackLibrary::add_url_tracks(const std::string& url) {
             std::vector<std::string> tokens = split(line);
             if (!tokens.empty()) {
                 formats.push_back(tokens[0]);
+                //std::cout << tokens[0] << std::endl;
             }
         }
     }
 
     std::reverse(new_tracks.begin(), new_tracks.end());
 
+    // Process each track individually
     for (const auto& track : new_tracks) {
         {
             std::lock_guard<std::mutex> lock(tracks_mutex);
@@ -204,6 +210,7 @@ std::vector<std::string> TrackLibrary::add_url_tracks(const std::string& url) {
                 continue;
             }
         }
+        // Extract formats
         std::vector<std::string> formats;
         std::regex data_line_regex(R"(^\s*(\d+)\s+)");
         for (const auto& fmt_line : track.format_lines) {
@@ -213,12 +220,14 @@ std::vector<std::string> TrackLibrary::add_url_tracks(const std::string& url) {
             }
         }
 
+        // Select best format
         std::string best_format = select_best_audio_format(track.format_lines);
         if (best_format == "") {
             std::cerr << "No suitable format found for track: " << track.track_title << std::endl;
             continue;;
         }
 
+        // Parse duration
         std::vector<size_t> time_parts;
         std::stringstream tsream(track.duration);
         std::string part;
