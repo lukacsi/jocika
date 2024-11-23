@@ -353,11 +353,13 @@ void GuildAudioManager::playback_loop() {
                             }
                             guild_queue->tracks_played.clear();
                         }
-                        std::shared_ptr<Track> track = guild_queue->tracks.front();
-                        guild_queue->current_track = track;
                         if (!guild_queue->loop_one) {
+                            std::shared_ptr<Track> track = guild_queue->tracks.front();
                             guild_queue->tracks.pop_front();
+                            guild_queue->current_track = track;
+
                         }
+                        auto track = guild_queue->current_track;
                         guild_queue->is_playing = true;
                         guild_queue->skip = false;
                         guild_queue->elapsed = 0;
@@ -380,15 +382,15 @@ void GuildAudioManager::playback_loop() {
 
                             audio->send_audio_to_voice(guild_id, track, stop_callback, ready_promise);
                             
-                            ready_future.wait();
-                            /*if (ready_future.wait_for(std::chrono::seconds(10)) == std::future_status::ready) {
+                            if (ready_future.wait_for(std::chrono::seconds(10)) == std::future_status::ready) {
                             } else {
                                 std::cerr << "[GuildAudioManager] Timeout waiting for audio to be ready for guild " << guild_id << std::endl;
                                 audio->stop_audio(guild_id);
                                 guild_queue->tracks_played.push_front(track);
                                 track->unload();
                                 return;
-                            } */
+                            }
+
                             size_t length_s = track->get_length();
                             size_t elapsed_s = 0;
                             while (elapsed_s < length_s) {
