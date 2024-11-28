@@ -471,13 +471,10 @@ std::string format_seconds(size_t total_seconds) {
 std::vector<std::string> GuildAudioManager::get_queued_tracks(dpp::snowflake guild_id) {
     std::shared_ptr<GuildQueue> queue;
     std::vector<std::string> tracks;
-    {
-        std::lock_guard<std::mutex> lock(manager_mutex);
-        queue = get_queue(guild_id);
-        if (!queue) {
-            std::cerr << "[GuildAudioManager] No queue found for guild " << guild_id << std::endl;
-            return tracks;
-        }
+    queue = get_queue(guild_id);
+    if (!queue) {
+        std::cerr << "[GuildAudioManager] No queue found for guild " << guild_id << std::endl;
+        return tracks;
     }
 
     {

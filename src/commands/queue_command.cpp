@@ -24,14 +24,15 @@ void QueueCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster&
         int i = max_tracks_reply;
         if (tracks.size() > 1) {
             reply_message += "Tracks queued:\n";
-            for (size_t i = 1; i < tracks.size(); ++i) {
+            for (size_t j = 1; j < tracks.size(); j++) {
                 if (i > 0) {
                     i--;
-                    reply_message += std::to_string(i) + ". " + tracks[i] + "\n";
+                    reply_message += std::to_string(j) + ". " + tracks[j] + "\n";
                 }
             }
             if (i == 0) {
                 event.reply(std::to_string(tracks.size() - max_tracks_reply) + " more tracks \n");
+                return;
             }
         }
         
