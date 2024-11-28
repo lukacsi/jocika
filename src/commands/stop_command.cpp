@@ -5,4 +5,5 @@ void StopCommand::execute(const dpp::slashcommand_t &event, const dpp::cluster &
     //audio_processor->stop_audio(guild_id);
     guild_audio_manager->clear_queue(guild_id);
     guild_audio_manager->skip_track(guild_id);
+    event.reply("Stopped playback and cleared queue!");
 }
