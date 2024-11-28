@@ -124,7 +124,7 @@ void PlayCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& 
         event.thinking(true, [event, this, guild_id, source, top, &i](const dpp::confirmation_callback_t& callback) {
             event.edit_original_response(dpp::message("Downloading track data"));
             auto names = track_library->add_url_tracks(source);
-            if (name.empty()) {
+            if (names.empty()) {
                 event.edit_original_response(dpp::message("Failed to initialize track."));
                 return;
             }
