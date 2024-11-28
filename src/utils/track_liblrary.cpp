@@ -123,9 +123,20 @@ std::vector<std::string> TrackLibrary::add_url_tracks(const std::string& url) {
     std::vector<std::string> data_lines;
     std::istringstream stream(data);
     std::string line;
+    //std::cout << "Debuglines begin\n";
     while (std::getline(stream, line)) {
+        if (line.find("WARNING") != std::string::npos) {
+            continue;
+        }
+
+        if (line.find("ERROR") != std::string::npos) {
+            std::cerr << "[TrackLibrary] yt-dlp error occurred" << std::endl;
+            return {};
+        }
         data_lines.push_back(line);
+        //std::cout << line << std::endl;
     }
+    //std::cout << "Debulines end\n";
 
     struct TrackInfo {
         std::vector<std::string> format_lines;
@@ -149,18 +160,10 @@ std::vector<std::string> TrackLibrary::add_url_tracks(const std::string& url) {
         idx--;
 
         line = trim(data_lines[idx]);
-        if (line.find("WARNING") != std::string::npos) {
-            continue;
-        }
-
-        if (line.find("ERROR") != std::string::npos) {
-            std::cerr << "[TrackLibrary] yt-dlp error occurred" << std::endl;
-            return {};
-        }
-
+        
         if (!in_formats) {
             // Assume that every track ends with duration, video_id, and title in that order
-            if (idx - 4 > 0) {
+            if (idx - 3 <= 0) {
                 std::cerr << "[TrackLibrary] Insufficient lines for track metadata." << std::endl;
                 break;
             }
