@@ -160,7 +160,7 @@ std::vector<std::string> TrackLibrary::add_url_tracks(const std::string& url) {
 
         if (!in_formats) {
             // Assume that every track ends with duration, video_id, and title in that order
-            if (idx + 4 < 0) {
+            if (idx - 4 > 0) {
                 std::cerr << "[TrackLibrary] Insufficient lines for track metadata." << std::endl;
                 break;
             }
@@ -176,12 +176,11 @@ std::vector<std::string> TrackLibrary::add_url_tracks(const std::string& url) {
             current_track.video_id = video_id;
             current_track.duration = duration;
 
-            //std::cout << track_title << video_id << duration << std::endl;
             in_formats = true;
             continue;
         }
 
-        if (line.find("ID  EXT") != std::string::npos) {
+        if (line.find("ID  ") != std::string::npos) {
             current_track.format_lines = formats;
             formats.clear();
             new_tracks.push_back(current_track);
