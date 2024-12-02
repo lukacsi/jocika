@@ -2,7 +2,7 @@
 #include "globals.h"
 #include <string>
 
-void QueueCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& bot) {
+void QueueCommand::execute(const dpp::slashcommand_t& event, dpp::cluster& bot) {
     auto cmd_data = event.command.get_command_interaction();
     if (!guild_audio_manager) {
         std::cerr << "[QueueCommand] guild_audio_manager is not initialized." << std::endl;

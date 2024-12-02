@@ -1,6 +1,6 @@
 #include "commands/pause_command.h"
 
-void PauseCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& bot) {
+void PauseCommand::execute(const dpp::slashcommand_t& event, dpp::cluster& bot) {
     auto ec = event.command;
     auto guild_id = ec.guild_id;
     //audio_processor->pause_audio(guild_id);

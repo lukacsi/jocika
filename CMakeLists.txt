@@ -14,13 +14,21 @@ add_executable(${PROJECT_NAME}
     ${SOURCES}
 )
 
+include(FetchContent)
+
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
+FetchContent_MakeAvailable(json)
+
 find_package(DPP REQUIRED)
 find_package(MPG123 REQUIRED)
+find_package(CURL REQUIRED)
 #find_package(Opus REQUIRED)
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    nlohmann_json::nlohmann_json
     ${DPP_LIBRARIES}
     ${MPG123_LIBRARIES}
+    ${CURL_LIBRARIES}
     #${OPUS_LIBRARY}
 )
 
