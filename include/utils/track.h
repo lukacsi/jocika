@@ -48,9 +48,7 @@ private:
     std::string best_format;
     std::vector<uint8_t> pcm_data;
     size_t length;
-    long rate;
-    int channels;
-    int encoding;
+
 };
 
 #endif

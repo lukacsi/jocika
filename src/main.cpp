@@ -13,6 +13,7 @@
 #include "commands/voice_recorder_command.h"
 #include "commands/voice_recorder_stop_command.h"
 #include "commands/weather_command.h"
+#include "commands/achievement_command.h"
 #include "listeners/listener_manager.h"
 #include "listeners/ready_listener.h"
 #include "listeners/slashcommand_listener.h"
@@ -20,6 +21,8 @@
 #include "utils/audio.h"
 #include "utils/guild_audio_manager.h"
 #include "utils/track_library.h"
+#include "utils/database.h"
+#include "utils/achievement_manager.h"
 #include <dpp/dpp.h>
 #include <iostream>
 #include <memory>
@@ -49,6 +52,7 @@ int main(int argc, char* argv[]) {
 
     bot.on_log(dpp::utility::cout_logger());
     
+    auto database = std::make_shared<Database>("database");
 
     auto track_library = std::make_shared<TrackLibrary>();
     if (!track_library->init_tracks(media_dir)) {
@@ -57,6 +61,7 @@ int main(int argc, char* argv[]) {
 
     auto audio_processor = std::make_shared<Audio>();
     auto guild_audio_manager = std::make_shared<GuildAudioManager>(audio_processor, track_library);
+    auto achievement_manager = std::make_shared<AchievementManager>(database);
 
     
     // register commands
@@ -72,6 +77,7 @@ int main(int argc, char* argv[]) {
     sharedCommandManager->add_command(std::make_unique<PauseCommand>(audio_processor, guild_audio_manager));
     sharedCommandManager->add_command(std::make_unique<ResumeCommand>(audio_processor, guild_audio_manager));
     sharedCommandManager->add_command(std::make_unique<LibraryCommand>(track_library));
+    sharedCommandManager->add_command(std::make_unique<AchievementCommand>(achievement_manager));
     sharedCommandManager->add_command(std::make_unique<SLogCommand>());
     sharedCommandManager->add_command(std::make_unique<WeatherCommand>());
     sharedCommandManager->add_command(std::make_unique<VoiceRecCommand>());

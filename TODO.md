@@ -1,5 +1,5 @@
 # To-do
-
+Playing long track from youtbe pause resume play from library youtube source skip: no sound in voice
 * MP playing from YouTube[X]
 * HP library search[X]
 * LP query on YouTube[]
