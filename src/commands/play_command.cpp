@@ -32,7 +32,7 @@ std::optional<std::pair<bool, std::string>> interpret_subcommand(dpp::command_da
 }
 */
 
-void PlayCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& bot) {
+void PlayCommand::execute(const dpp::slashcommand_t& event, dpp::cluster& bot) {
     dpp::command_interaction cmd_data = event.command.get_command_interaction();
     auto guild_id = event.command.guild_id;
 

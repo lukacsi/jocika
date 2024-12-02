@@ -1,6 +1,6 @@
 #include "commands/library_command.h"
 
-void LibraryCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& bot) {
+void LibraryCommand::execute(const dpp::slashcommand_t& event, dpp::cluster& bot) {
     std::string name;
     bool search_specified = false;
     if (std::holds_alternative<std::string>(event.get_parameter("search"))) {

@@ -10,9 +10,13 @@
 #include "commands/resume_command.h"
 #include "commands/skip_command.h"
 #include "commands/stop_command.h"
+#include "commands/voice_recorder_command.h"
+#include "commands/voice_recorder_stop_command.h"
+#include "commands/weather_command.h"
 #include "listeners/listener_manager.h"
 #include "listeners/ready_listener.h"
 #include "listeners/slashcommand_listener.h"
+#include "listeners/voice_recorder_listener.h"
 #include "utils/audio.h"
 #include "utils/guild_audio_manager.h"
 #include "utils/track_library.h"
@@ -69,11 +73,15 @@ int main(int argc, char* argv[]) {
     sharedCommandManager->add_command(std::make_unique<ResumeCommand>(audio_processor, guild_audio_manager));
     sharedCommandManager->add_command(std::make_unique<LibraryCommand>(track_library));
     sharedCommandManager->add_command(std::make_unique<SLogCommand>());
+    sharedCommandManager->add_command(std::make_unique<WeatherCommand>());
+    sharedCommandManager->add_command(std::make_unique<VoiceRecCommand>());
+    sharedCommandManager->add_command(std::make_unique<VoiceRecStopCommand>());
 
     auto listenerManager = std::make_unique<ListenerManager>();
     listenerManager->add_listener(std::make_unique<ReadyListener>(sharedCommandManager, register_commands));
     listenerManager->add_listener(std::make_unique<SlashCommandListener>(sharedCommandManager));
     listenerManager->add_listener(std::make_unique<SLogListener>(sharedCommandManager));
+    listenerManager->add_listener(std::make_unique<VoiceRecListener>(sharedCommandManager));
 
     listenerManager->register_listeners(bot);
 

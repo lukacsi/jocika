@@ -1,6 +1,6 @@
 #include "commands/resume_command.h"
 
-void ResumeCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& bot) {
+void ResumeCommand::execute(const dpp::slashcommand_t& event, dpp::cluster& bot) {
     auto ec = event.command;
     auto guild_id = ec.guild_id;
     //audio_processor->resume_audio(guild_id);

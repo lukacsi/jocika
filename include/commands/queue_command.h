@@ -25,7 +25,7 @@ public:
         add_option(loop_one);
         add_option(loop_all);
     }
-    void execute(const dpp::slashcommand_t& event, const dpp::cluster& bot) override;
+    void execute(const dpp::slashcommand_t& event, dpp::cluster& bot) override;
 
 };
 

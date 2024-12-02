@@ -1,6 +1,6 @@
 #include "commands/join_command.h"
 
-void JoinCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& bot) {
+void JoinCommand::execute(const dpp::slashcommand_t& event, dpp::cluster& bot) {
     auto ec = event.command;
     auto guild_id = ec.guild_id;
 

@@ -1,7 +1,7 @@
 #include "commands/slog_command.h"
 #include "globals.h"
 
-void SLogCommand::execute(const dpp::slashcommand_t& event, const dpp::cluster& bot) {
+void SLogCommand::execute(const dpp::slashcommand_t& event, dpp::cluster& bot) {
 
 /*
 

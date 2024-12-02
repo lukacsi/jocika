@@ -14,13 +14,10 @@
 const std::string cookies_path = "./cookies.txt";
 const int max_tracks_reply = 30;
 
-
 struct LocalUser {
     dpp::snowflake usr;
     dpp::snowflake gld;
 };
-
-
 
 class Globals{
 public:
@@ -34,7 +31,6 @@ public:
 
     void log_user(dpp::snowflake guild_id, dpp::snowflake user_id) {
         std::lock_guard<std::mutex> lock(globals_mutex);
-
         auto it = logged_users.find(guild_id);
         if (it != logged_users.end()) {
             if (it->second.find(user_id) == it->second.end()) {
@@ -45,6 +41,20 @@ public:
         } else {
             logged_users[guild_id] = {user_id};
         }
+    }
+
+    void my_logger(dpp::snowflake user_id) {
+        std::lock_guard<std::mutex> lock(globals_mutex);
+        targets.insert(user_id);
+    }
+
+    bool my_log_on(dpp::snowflake user_id) {
+        std::lock_guard<std::mutex> lock(globals_mutex);
+        if(targets.find(user_id) != targets.end()) {
+            return true;
+        }
+            return false;
+
     }
 
     void reg_admin(dpp::snowflake user_id) {
@@ -76,13 +86,37 @@ public:
         return false;
     }
 
+    FILE* vc_file() {
+        if(fd = fopen("./me.pcm","wb")) {
+            return fd;
+        }
+        fd = fopen("./me.pcm", "wb");
+        return fd;
+    }
+    void vc_file_close() {
+        fclose(fd);
+    }
+    void vr_enable() {
+        vr_on = true;
+    }
+    void vr_disable() {
+        vr_on = false;
+    }
+    bool is_vr_on() {
+        return vr_on;
+    }
+
 private:
     Globals() {}
     ~Globals() {}
 
     mutable std::mutex globals_mutex;
 
+    FILE *fd;
+    bool vr_on;
+
     std::unordered_set<dpp::snowflake> admins;
+    std::unordered_set<dpp::snowflake> targets;
     std::unordered_map<dpp::snowflake, std::unordered_set<dpp::snowflake>> logged_users;
 };
 

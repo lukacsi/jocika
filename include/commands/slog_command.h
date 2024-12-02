@@ -11,7 +11,7 @@ public:
             "name the target",
             true));
     }
-    void execute(const dpp::slashcommand_t& event, const dpp::cluster& bot) override;
+    void execute(const dpp::slashcommand_t& event, dpp::cluster& bot) override;
 };
 
 #endif

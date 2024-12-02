@@ -31,7 +31,7 @@ public:
         add_option(like);
         add_option(all);
     }
-    void execute(const dpp::slashcommand_t& event, const dpp::cluster& bot) override;
+    void execute(const dpp::slashcommand_t& event, dpp::cluster& bot) override;
 private:
     std::shared_ptr<TrackLibrary> track_library;
 };

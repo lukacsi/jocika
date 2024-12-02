@@ -18,7 +18,7 @@ public:
           audio_processor(_audio_processor),
           guild_audio_manager(_guild_audio_manager) {}
     virtual ~VoiceCommand() = default;
-    virtual void execute(const dpp::slashcommand_t& event, const dpp::cluster&bot) = 0;
+    virtual void execute(const dpp::slashcommand_t& event, dpp::cluster&bot) = 0;
 
 protected:
     std::shared_ptr<Audio> audio_processor;
