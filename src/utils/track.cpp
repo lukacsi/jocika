@@ -6,7 +6,7 @@
 
 
 Track::Track(const std::string& _name, const std::string& _source, SourceType _source_type)
-    : name(_name), source(_source), length(0), rate(0), channels(0),  encoding(0), source_type(_source_type) {}
+    : name(_name), source(_source), length(0), source_type(_source_type) {}
 
 
 Track::Track(const std::string& _name, const std::string& _soruce, SourceType _source_type, const std::string& _best_format, const size_t& _lenght)
@@ -69,7 +69,9 @@ bool Track::init() {
             mpg123_exit();
             return false;
         }
-
+        long rate;
+        int channels;
+        int encoding;
         if (mpg123_getformat(mh, &rate, &channels, &encoding) != MPG123_OK) {
             std::cerr << "[Track] Bad format: " << mpg123_strerror(mh) << std::endl;
             mpg123_close(mh);
@@ -210,6 +212,9 @@ bool Track::load() {
             mpg123_exit();
             return false;
         }
+        long rate;
+        int channels;
+        int encoding;
 
         if (mpg123_getformat(mh, &rate, &channels, &encoding) != MPG123_OK) {
             std::cerr << "[Track] Bad format: " << mpg123_strerror(mh) << std::endl;
