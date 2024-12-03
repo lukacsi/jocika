@@ -3,6 +3,7 @@
 //
 
 #include "commands/weather_command.h"
+#include "utils/weather_boi.h"
 
 void WeatherCommand::execute(const dpp::slashcommand_t &event, dpp::cluster &bot) {
     std::string city = std::get<std::string>(event.get_parameter("city"));

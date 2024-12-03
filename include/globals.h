@@ -5,14 +5,16 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
+#include <cstdint>
 #include <dpp/snowflake.h>
 #include <mutex>
 #include <unordered_set>
 #include <dpp/dpp.h>
-
 #include <string>
+
 const std::string cookies_path = "./cookies.txt";
 const int max_tracks_reply = 30;
+const std::vector<uint64_t> owners = {274276440642551818, 385139194391166989};
 
 struct LocalUser {
     dpp::snowflake usr;
@@ -87,10 +89,11 @@ public:
     }
 
     FILE* vc_file() {
-        if(fd = fopen("./me.pcm","wb")) {
+        if(vr_on){
             return fd;
         }
         fd = fopen("./me.pcm", "wb");
+        vr_on = true;
         return fd;
     }
     void vc_file_close() {

@@ -22,6 +22,7 @@ FetchContent_MakeAvailable(json)
 find_package(DPP REQUIRED)
 find_package(MPG123 REQUIRED)
 find_package(CURL REQUIRED)
+find_package(SQLite3 REQUIRED)
 #find_package(Opus REQUIRED)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -29,6 +30,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${DPP_LIBRARIES}
     ${MPG123_LIBRARIES}
     ${CURL_LIBRARIES}
+    SQLite::SQLite3
     #${OPUS_LIBRARY}
 )
 

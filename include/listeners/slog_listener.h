@@ -4,7 +4,6 @@
 #include "listener.h"
 #include "commands/command_manager.h"
 #include <memory>
-#include <fstream>
 
 class SLogListener : public Listener {
 public:
