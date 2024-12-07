@@ -16,6 +16,7 @@ public:
     sqlite3* db;
 private:
     void initialize_tables();
+    void insert_initial_entries();
 };
 
 #endif

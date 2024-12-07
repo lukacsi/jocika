@@ -2,6 +2,10 @@
 
 - [DPP](https://github.com/brainboxdotcc/DPP)
 - [MPG123](https://www.mpg123.de/)
+- yt-dlp
+- curl
+- nlohmann/json
+- SQLite3
 
 
 # Configuring
@@ -20,15 +24,15 @@ Follow these steps to clone the repository, create a build directory, configure 
 
 1. **Clone the Repository:**
    ```bash
-   git clone https://github.com/lukacsi/joci
+   git clone https://github.com/lukacsi/jocika
    ```
-   This command clones the `joci` repository from GitHub to your local machine.
+   This command clones the `jocika` repository from GitHub to your local machine.
 
 2. **Navigate to the Project Directory:**
    ```bash
-   cd joci
+   cd jocika
    ```
-   Change your current directory to the cloned `joci` directory.
+   Change your current directory to the cloned `jocika` directory.
 
 3. **Create and navigate to the Build Directory:**
    ```bash
@@ -50,19 +54,19 @@ Follow these steps to clone the repository, create a build directory, configure 
 
 6. **Build the Project:**
    ```bash
-   cmake --build /build
+   cmake --build ./build
    ```
    This command compiles the project based on the generated build files.
 
 Easy to copy format:
 ```bash
-git clone https://github.com/lukacsi/joci
+git clone https://github.com/lukacsi/jocika
 cd joci
 mkdir build
 cd build
 cmake ..
 cd ..
-cmake --build /build
+cmake --build ./build
 ```
 
 # Running
@@ -71,7 +75,7 @@ After successfully building the project, you can run the executable with the fol
 
 ```bash
 cd build
-./joci
+./jocika
 ```
 
 # Additional Tips

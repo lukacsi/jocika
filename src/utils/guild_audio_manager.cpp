@@ -300,11 +300,10 @@ void GuildAudioManager::clear_queue(dpp::snowflake guild_id) {
         if (it != guild_queues.end()) {
             guild_queue = it->second;
             {
-                std::lock_guard<std::mutex> queue_lock(guild_queue->queue_mutex);
-                guild_queue->stop = true;
+                std::lock_guard<std::mutex> lock(it->second->queue_mutex);
+                it->second->tracks.clear();
+                it->second->tracks_played.clear();
             }
-
-            guild_queues.erase(it);
             std::cout << "[GuildAudioManager] Removed queue for guild " << guild_id << std::endl;
         }
     }

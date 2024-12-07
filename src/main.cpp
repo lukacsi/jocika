@@ -47,6 +47,7 @@ int main(int argc, char* argv[]) {
         std::cerr << "DISCORD_BOT_TOKEN environmental variable not set." << std::endl;
         return EXIT_FAILURE;
     }
+
     const std::string token = token_env;
     dpp::cluster bot(token, dpp::i_default_intents | dpp::i_message_content);
 

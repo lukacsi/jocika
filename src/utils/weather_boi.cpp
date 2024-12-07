@@ -1,5 +1,6 @@
 #include "utils/weather_boi.h"
 #include <curl/curl.h>
+#include <iostream>
 
 size_t WeatherBoi::CallBackWriter(void* content, size_t size, size_t nmemb, void* userp) {
     ((std::string*)userp)->append((char*)content, size*nmemb);

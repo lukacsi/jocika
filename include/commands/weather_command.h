@@ -5,7 +5,6 @@
 #ifndef WEATHER_COMMAND_H
 #define WEATHER_COMMAND_H
 #include "command.h"
-#include "utils/weather_boi.h"
 
 
 class WeatherCommand : public Command {

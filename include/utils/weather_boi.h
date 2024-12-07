@@ -5,10 +5,8 @@
 #ifndef WEATHER_BOI_H
 #define WEATHER_BOI_H
 
-#include "dpp/dpp.h"
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
-#include <iostream>
 #include <string>
 
 
