@@ -18,6 +18,8 @@ export DISCORD_BOT_TOKEN="your_token_here"
 
 > Do not share your token!
 
+Most of the configarable parameters are located in globals.h, and in the main function.
+
 # Building
 
 Follow these steps to clone the repository, create a build directory, configure the project with CMake, and build the project:
@@ -34,27 +36,21 @@ Follow these steps to clone the repository, create a build directory, configure 
    ```
    Change your current directory to the cloned `jocika` directory.
 
-3. **Create and navigate to the Build Directory:**
+3. **Create the Build Directory:**
    ```bash
-   mkdir build && cd build
+   mkdir build
    ```
    It's a good practice to perform out-of-source builds. This command creates a separate `build` directory.
 
 4. **Configure the Project with CMake:**
    ```bash
-   cmake ..
+   cmake -B build
    ```
    This command configures the project using CMake, generating the necessary build files in the `build` directory.
 
-5. **Navigate to the project root:**
+5. **Build the Project:**
    ```bash
-   cd ..
-   ```
-   Change your current directory to the `build` directory where the build files are located.
-
-6. **Build the Project:**
-   ```bash
-   cmake --build ./build
+   cmake --build build
    ```
    This command compiles the project based on the generated build files.
 
@@ -63,10 +59,8 @@ Easy to copy format:
 git clone https://github.com/lukacsi/jocika
 cd joci
 mkdir build
-cd build
-cmake ..
-cd ..
-cmake --build ./build
+cmake -B build
+cmake --build build
 ```
 
 # Running
@@ -94,3 +88,4 @@ cd build
   echo 'export DISCORD_BOT_TOKEN="your_token_here"' >> ~/.bashrc
   source ~/.bashrc
   ```
+
