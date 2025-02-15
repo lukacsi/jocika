@@ -39,8 +39,8 @@ void Database::initialize_tables() {
         );
     )";
 
-    const char* op_users_table = R"(
-        CREATE TABLE IF NOT EXISTS op_users (
+    const char* user_permissions_table = R"(
+        CREATE TABLE IF NOT EXISTS user_permissions(
             user_id INTEGER PRIMARY KEY,
             permission_level INTEGER NOT NULL
         );
@@ -58,7 +58,7 @@ void Database::initialize_tables() {
 
     execute_query(achievements_table);
     execute_query(user_achievements_table);
-    execute_query(op_users_table);
+    execute_query(user_permissions_table);
     execute_query(tracks_table);
     insert_initial_entries();
 }
@@ -97,8 +97,8 @@ void Database::insert_initial_entries() {
     }
 
     const std::string insert_op_users_query = R"(
-        INSERT INTO op_users (user_id, permission_level) VALUES
-            (?, 4)
+        INSERT INTO user_permissions (user_id, permission_level) VALUES
+            (?, 6004)
         ON CONFLICT(user_id) DO NOTHING;
     )";
 

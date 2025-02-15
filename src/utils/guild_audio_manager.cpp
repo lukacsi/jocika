@@ -325,7 +325,7 @@ void GuildAudioManager::playback_loop() {
 
         {
             std::lock_guard<std::mutex> manager_lock(manager_mutex);
-            for (auto it = guild_queues.begin(); it != guild_queues.end(); ) {
+            for (auto it = guild_queues.begin(); it != guild_queues.end();) {
                 auto guild_id = it->first;
                 std::shared_ptr<GuildQueue> guild_queue = it->second;
 
@@ -408,6 +408,10 @@ void GuildAudioManager::playback_loop() {
                                         cv.notify_all();
                                         guild_queue->tracks_played.push_front(track);
                                         track->unload();
+                                        if ((guild_queue->tracks.empty() && !(guild_queue->loop_all || guild_queue->loop_one)) || guild_queue->stop) {
+                                            std::cout << "[GuildAudioManager] Finished queue in guild: " << guild_id << ", disconnecting from voice."<< std::endl;
+                                            audio->disconnect_voice(guild_id);
+                                        }
                                         return;
                                     }
                                     guild_queue->elapsed = elapsed_s;
@@ -423,12 +427,15 @@ void GuildAudioManager::playback_loop() {
                             }
                             std::cout << "[GuildAudioManager] Finished playing track " << track->get_name() << std::endl;
                             guild_queue->tracks_played.push_front(track);
+                            if (guild_queue->tracks.empty() && !(guild_queue->loop_all || guild_queue->loop_one)) {
+                                std::cout << "[GuildAudioManager] Finished queue in guild: " << guild_id << ", disconnecting from voice."<< std::endl;
+                                audio->disconnect_voice(guild_id);
+                            }
                             track->unload();
                             cv.notify_all();
                         }).detach();
                     }
                 }
-
                 ++it;            
             }
         }
