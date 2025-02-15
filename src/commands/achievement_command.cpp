@@ -1,11 +1,12 @@
 #include "commands/achievement_command.h"
+#include "utils/permission_manager.h"
 #include <cstdint>
 #include <memory>
 #include <string>
 
 void AchievementCommand::execute(const dpp::slashcommand_t& event, dpp::cluster& bot) {
     auto cmd_data = event.command.get_command_interaction();
-
+    auto user = event.command.usr.id;
     auto guild_id = event.command.guild_id;
     auto subcommand = cmd_data.options[0];
 
@@ -34,6 +35,10 @@ void AchievementCommand::execute(const dpp::slashcommand_t& event, dpp::cluster&
 
         event.reply(reply);
     } else if (subcommand.name == "add") {
+        if (!permission_manager->check_permission(user, VIP_PERMISSION)) {
+            event.reply("You dont have permission to use this command!");
+            return;
+        }
         std::string name, description, image;
         for (int i = 0; i < 3; i++) {
             auto option = subcommand.options[i];
@@ -55,7 +60,10 @@ void AchievementCommand::execute(const dpp::slashcommand_t& event, dpp::cluster&
                     + achievement->description + " " + achievement->image_url);
     } else if (subcommand.name == "complete") {
         uint64_t ach_id, user_id;
-        
+        if (!permission_manager->check_permission(user, VIP_PERMISSION)) {
+            event.reply("You dont have permission to use this command!");
+            return;
+        }
         for (int i = 0; i < 2; i++) {
             auto option = subcommand.options[i];
             if (option.name == "user") {

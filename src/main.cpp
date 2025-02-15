@@ -3,6 +3,7 @@
 #include "commands/join_command.h"
 #include "commands/library_command.h"
 #include "commands/pause_command.h"
+#include "commands/permission_command.h"
 #include "commands/ping_command.h"
 #include "commands/disconnect_command.h"
 #include "commands/play_command.h"
@@ -20,6 +21,7 @@
 #include "listeners/voice_recorder_listener.h"
 #include "utils/audio.h"
 #include "utils/guild_audio_manager.h"
+#include "utils/permission_manager.h"
 #include "utils/track_library.h"
 #include "utils/database.h"
 #include "utils/achievement_manager.h"
@@ -63,6 +65,7 @@ int main(int argc, char* argv[]) {
     auto audio_processor = std::make_shared<Audio>();
     auto guild_audio_manager = std::make_shared<GuildAudioManager>(audio_processor, track_library);
     auto achievement_manager = std::make_shared<AchievementManager>(database);
+    auto permission_manager = std::make_shared<PermissionManager>(database);
 
     
     // register commands
@@ -78,11 +81,12 @@ int main(int argc, char* argv[]) {
     sharedCommandManager->add_command(std::make_unique<PauseCommand>(audio_processor, guild_audio_manager));
     sharedCommandManager->add_command(std::make_unique<ResumeCommand>(audio_processor, guild_audio_manager));
     sharedCommandManager->add_command(std::make_unique<LibraryCommand>(track_library));
-    sharedCommandManager->add_command(std::make_unique<AchievementCommand>(achievement_manager));
+    sharedCommandManager->add_command(std::make_unique<AchievementCommand>(achievement_manager, permission_manager));
     sharedCommandManager->add_command(std::make_unique<SLogCommand>());
     sharedCommandManager->add_command(std::make_unique<WeatherCommand>());
     sharedCommandManager->add_command(std::make_unique<VoiceRecCommand>());
     sharedCommandManager->add_command(std::make_unique<VoiceRecStopCommand>());
+    sharedCommandManager->add_command(std::make_unique<PermissionCommand>(permission_manager));
 
     auto listenerManager = std::make_unique<ListenerManager>();
     listenerManager->add_listener(std::make_unique<ReadyListener>(sharedCommandManager, register_commands));
